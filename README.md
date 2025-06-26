@@ -16,7 +16,7 @@ MeRNSTA fuses an autoregressive Transformer with an **elastic, SQL‑backed, dyn
 Each token is logged with entropy, timestamp, context‑hash and a Bayesian relevance score.  
 A **real‑time contradiction resolver** suppresses logits that conflict with high‑confidence memory, yielding *long‑horizon factual coherence* without sacrificing creativity.
 
-*Moat → proprietary token‑ranking & logit‑suppression algorithms (US Provisional #63/XXXXXX filed 2025‑06‑26) and an auto‑tuned γ parameter learned with PPO.*
+
 
 ---
 
@@ -42,7 +42,7 @@ A **real‑time contradiction resolver** suppresses logits that conflict with hi
      │   ┌────────[4] Cortex Engine────────┐
      │   │  Bayesian rank Δr               │
      │   │  PPO‑tuned γ                    │
-     │   └─────────┬───────────────────────┘
+     │   └──────────┬──────────────────────┘
      │ contradiction│
      ▼              ▼
 ┌──────────[5] Logit Guard─────────────────┐
