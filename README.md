@@ -1,13 +1,19 @@
 
 # MeRNSTA — Memory‑Ranked Neuro‑Symbolic Transformer Architecture
 
+> ⚠️ **WARNING: OUTDATED VERSION**
+>
+> This README describes **v0.3.1** of MeRNSTA.
+> The latest version is **v0.6.4** and is **closed source**.
+> This repo does **not** reflect the current system architecture.
+
 **Elastic working‑memory cortex for large language models**  
 *Version&nbsp;0.3.1 · Research Preview*
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/<user>/mernsta/actions)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/<user>/mernsta/blob/main/LICENSE)
-[![Docker Pulls](https://img.shields.io/docker/pulls/<user>/mernsta)](https://hub.docker.com/r/<user>/mernsta)
-[![Patent Pending](https://img.shields.io/badge/patent‑pending-critical)](https://patents.google.com/)
+
+![Status](https://img.shields.io/badge/status-🚧%20v0.6.4%20Closed--Source-critical?style=for-the-badge&color=red)
+
 
 ---
 
