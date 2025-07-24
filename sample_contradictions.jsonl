@@ -1,0 +1,11 @@
+[{"id":1,"fact_a_id":1,"fact_b_id":"88632f56-c64a-4086-afeb-4092c3e89117","timestamp":"2025-07-24T05:02:49.859703","resolved":0,"resolution_notes":null,"confidence":0.900000000000000022},
+{"id":2,"fact_a_id":12,"fact_b_id":"1ed8daab-8663-443c-a52f-5beca14902a2","timestamp":"2025-07-24T05:24:53.653507","resolved":0,"resolution_notes":null,"confidence":0.900000000000000022},
+{"id":3,"fact_a_id":13,"fact_b_id":"367a49c3-2003-4e30-a13d-3c1f0390e976","timestamp":"2025-07-24T05:33:36.343567","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":4,"fact_a_id":12,"fact_b_id":"d5bdf6fc-917e-465b-82d5-df5abdfa75d7","timestamp":"2025-07-24T05:33:36.522047","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":5,"fact_a_id":9,"fact_b_id":"560b5d89-3854-4e66-9467-1f2215ce7cc8","timestamp":"2025-07-24T05:51:12.372437","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":6,"fact_a_id":3,"fact_b_id":"560b5d89-3854-4e66-9467-1f2215ce7cc8","timestamp":"2025-07-24T05:51:12.412777","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":7,"fact_a_id":16,"fact_b_id":"d98d44c3-a0cf-4565-a04a-b0a62554d358","timestamp":"2025-07-24T05:51:18.620427","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":8,"fact_a_id":9,"fact_b_id":"d98d44c3-a0cf-4565-a04a-b0a62554d358","timestamp":"2025-07-24T05:51:18.633208","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":9,"fact_a_id":16,"fact_b_id":"e71bf332-e443-4a67-98ec-48871d16c487","timestamp":"2025-07-24T05:51:32.347673","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":10,"fact_a_id":9,"fact_b_id":"e71bf332-e443-4a67-98ec-48871d16c487","timestamp":"2025-07-24T05:51:32.361286","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044},
+{"id":11,"fact_a_id":3,"fact_b_id":"e71bf332-e443-4a67-98ec-48871d16c487","timestamp":"2025-07-24T05:51:32.400189","resolved":0,"resolution_notes":null,"confidence":0.800000000000000044}]
