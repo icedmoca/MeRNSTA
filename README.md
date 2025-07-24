@@ -23,7 +23,7 @@ python3 install.py
 git clone https://github.com/icedmoca/mernsta.git
 cd mernsta
 pip install -r requirements.txt
-python3 -m spacy download en_core_web_trf --break-system-packages
+python3 -m spacy download en_core_web_lg --break-system-packages
 python3 run_mernsta.py
 ```
 
