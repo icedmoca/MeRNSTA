@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/visualizer/css/visualizer.css">
+    
+    <!-- Configuration -->
+    <script>
+        window.VISUALIZER_CONFIG = {{ config | tojson }};
+    </script>
+</head>
+<body class="theme-{{ config.ui_settings.theme | default('dark') }}">
+    <!-- Header -->
+    <header class="visualizer-header">
+        <div class="header-content">
+            <h1>🧠 MeRNSTA Memory Graph Visualizer</h1>
+            <div class="header-controls">
+                <button id="theme-toggle" class="btn btn-secondary">
+                    {{ '🌙' if config.ui_settings.theme == 'light' else '☀️' }}
+                </button>
+                <div class="status-indicator" id="connection-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="visualizer-main">
+        <!-- Module Grid -->
+        <div class="modules-grid">
+            
+            <!-- Contradiction Map Module -->
+            <div class="module-card" data-module="contradiction_map">
+                <div class="module-header">
+                    <h3>🔗 Contradiction Map</h3>
+                    <div class="module-status" id="status-contradiction_map">
+                        <span class="status-dot"></span>
+                    </div>
+                </div>
+                <div class="module-preview" id="preview-contradiction_map">
+                    <svg class="preview-svg"></svg>
+                </div>
+                <div class="module-info">
+                    <p>Interactive visualization of memory contradictions and fact relationships</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <span class="stat-label">Contradictions:</span>
+                            <span class="stat-value" id="stat-contradictions">-</span>
+                        </span>
+                        <span class="stat">
+                            <span class="stat-label">Facts:</span>
+                            <span class="stat-value" id="stat-facts">-</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="module-actions">
+                    <button class="btn btn-primary" onclick="openModule('contradiction_map')">
+                        Open Full View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Personality Evolution Module -->
+            <div class="module-card" data-module="personality_evolution">
+                <div class="module-header">
+                    <h3>🎭 Personality Evolution</h3>
+                    <div class="module-status" id="status-personality_evolution">
+                        <span class="status-dot"></span>
+                    </div>
+                </div>
+                <div class="module-preview" id="preview-personality_evolution">
+                    <svg class="preview-svg"></svg>
+                </div>
+                <div class="module-info">
+                    <p>Timeline visualization of personality trait changes and evolution triggers</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <span class="stat-label">Evolution Steps:</span>
+                            <span class="stat-value" id="stat-evolution-steps">-</span>
+                        </span>
+                        <span class="stat">
+                            <span class="stat-label">Stability:</span>
+                            <span class="stat-value" id="stat-stability">-</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="module-actions">
+                    <button class="btn btn-primary" onclick="openModule('personality_evolution')">
+                        Open Full View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Flow DAG Module -->
+            <div class="module-card" data-module="task_flow_dag">
+                <div class="module-header">
+                    <h3>📊 Task Flow DAG</h3>
+                    <div class="module-status" id="status-task_flow_dag">
+                        <span class="status-dot"></span>
+                    </div>
+                </div>
+                <div class="module-preview" id="preview-task_flow_dag">
+                    <svg class="preview-svg"></svg>
+                </div>
+                <div class="module-info">
+                    <p>Directed acyclic graph of plan execution, memory formation, and scoring</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <span class="stat-label">Plans:</span>
+                            <span class="stat-value" id="stat-plans">-</span>
+                        </span>
+                        <span class="stat">
+                            <span class="stat-label">Success Rate:</span>
+                            <span class="stat-value" id="stat-success-rate">-</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="module-actions">
+                    <button class="btn btn-primary" onclick="openModule('task_flow_dag')">
+                        Open Full View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dissonance Heatmap Module -->
+            <div class="module-card" data-module="dissonance_heatmap">
+                <div class="module-header">
+                    <h3>🔥 Dissonance Heatmap</h3>
+                    <div class="module-status" id="status-dissonance_heatmap">
+                        <span class="status-dot"></span>
+                    </div>
+                </div>
+                <div class="module-preview" id="preview-dissonance_heatmap">
+                    <svg class="preview-svg"></svg>
+                </div>
+                <div class="module-info">
+                    <p>Heat map visualization of cognitive dissonance intensity over time</p>
+                    <div class="module-stats">
+                        <span class="stat">
+                            <span class="stat-label">Events:</span>
+                            <span class="stat-value" id="stat-dissonance-events">-</span>
+                        </span>
+                        <span class="stat">
+                            <span class="stat-label">Avg Intensity:</span>
+                            <span class="stat-value" id="stat-avg-intensity">-</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="module-actions">
+                    <button class="btn btn-primary" onclick="openModule('dissonance_heatmap')">
+                        Open Full View
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Events Panel -->
+        <div class="events-panel">
+            <div class="panel-header">
+                <h3>⚡ Real-time Cognitive Events</h3>
+                <div class="panel-controls">
+                    <button class="btn btn-secondary" onclick="toggleEventsPause()">
+                        <span id="events-toggle-text">Pause</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearEvents()">Clear</button>
+                    <button class="btn btn-primary" onclick="openEventsFullView()">Full View</button>
+                </div>
+            </div>
+            <div class="events-stream" id="events-stream">
+                <!-- Events will be populated here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="visualizer-footer">
+        <div class="footer-content">
+            <span>MeRNSTA Memory Graph Visualizer - Phase 34</span>
+            <span id="last-update">Last update: --</span>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/static/visualizer/js/core.js"></script>
+    <script src="/static/visualizer/js/dashboard.js"></script>
+    <script src="/static/visualizer/js/preview-widgets.js"></script>
+</body>
+</html>

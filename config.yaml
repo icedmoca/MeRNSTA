@@ -1,0 +1,1961 @@
+storage_uri: "postgresql://astro:password@localhost:5432/cortex"
+beta: 5                  # logit penalty scale
+gamma: 0.15              # contradiction distance weight
+
+facts:
+  - good: "blue"
+    bad:  "red"
+  - good: "sushi"
+    bad:  "pizza"
+
+prune_rank_threshold: 0.5      # delete rows whose rank drops below
+prune_age_seconds: 3600        # …or older than 1 hour
+
+# === MERNSTA COMPREHENSIVE CONFIGURATION ===
+# All previously hardcoded values are now centralized here
+
+# === TOKENIZER CONFIGURATION ===
+tokenizer:
+  host: "http://127.0.0.1:11434"
+  model: "tinyllama"
+
+# === SPACY MODEL CONFIGURATION ===
+spacy:
+  model: "en_core_web_sm"  # Options: en_core_web_sm, en_core_web_md, en_core_web_lg
+  load_timeout: 60  # seconds
+
+# === MEMORY BACKEND CONFIGURATION ===
+memory:
+  vector_backend: "default"  # options: default, hrrformer, vecsymr, hlb
+  hybrid_mode: true          # enable multiple backends for intelligent fusion
+  fallback_backend: "default"  # fallback if primary backend fails
+  
+  # === HYBRID MEMORY INTELLIGENCE ===
+  hybrid_strategy: "ensemble"  # options: ensemble, priority, contextual
+  hybrid_backends: ["default", "hrrformer", "vecsymr", "hlb"]
+  backend_weights:
+    default: 0.3      # Semantic search baseline
+    hrrformer: 0.25   # Symbolic reasoning
+    vecsymr: 0.2      # Analogical mapping
+    hlb: 0.25         # Hadamard-derived Linear Binding
+  
+  # === FUSION PARAMETERS ===
+  confidence_threshold: 0.3
+  recency_weight: 0.2
+  semantic_weight: 0.5
+  source_weight: 0.3
+  max_workers: 3
+  backend_timeout: 10.0
+
+# === DRIFT AUTO-EXECUTION CONFIGURATION ===
+drift_auto_execute: true
+drift_execution_interval: 600  # seconds
+drift_goal_priority_threshold: 0.7
+
+# === DRIFT WATCHER CONFIGURATION ===
+drift_watcher_interval: 300  # seconds (5 minutes)
+drift_volatility_threshold: 0.7
+drift_contradiction_threshold: 0.3
+drift_entropy_threshold: 0.8
+drift_prediction_confidence: 0.6
+
+# === STRATEGY OPTIMIZATION CONFIGURATION ===
+strategy_analysis_interval: 3600  # seconds (1 hour)
+
+# === MEMORY CONSOLIDATION CONFIGURATION ===
+memory_consolidation_interval: 3600  # seconds (1 hour)
+cluster_stability_threshold: 0.8
+min_facts_for_consolidation: 3
+max_volatility_for_consolidation: 0.2
+
+# === META MONITOR CONFIGURATION ===
+meta_monitor_interval: 1800  # seconds (30 minutes)
+metric_history_window: 86400  # seconds (24 hours)
+
+# === REASONING & COGNITIVE CAPABILITIES ===
+reasoning:
+  enable_symbolic_reasoning: true
+  enable_llm_fallback: true
+  llm_model: "tinyllama"
+  fallback_threshold: 0.5
+  symbolic_patterns:
+    math_confidence: 0.9
+    logic_confidence: 0.8
+  llm_fallback:
+    max_context_turns: 5
+    response_confidence: 0.8
+    conversation_timeout: 300  # seconds
+
+# === MULTI-AGENT COGNITIVE SYSTEM ===
+multi_agent:
+  enabled: true
+  debate_mode: true
+  agents:
+    - planner
+    - critic
+    - debater
+    - reflector
+    - recursive_planner
+    - self_prompter
+    - self_healer
+    - architect_analyzer
+    - code_refactorer
+    - upgrade_manager
+    - decision_planner
+    - strategy_evaluator
+    - task_selector
+    - debate_engine
+    - reflection_orchestrator
+    - world_modeler
+    - constraint_engine
+    - self_replicator
+    - agent_replicator
+    - meta_self
+    - fast_reflex
+    - mesh_manager
+    - cognitive_arbiter
+  agent_configs:
+    planner:
+      style: "structured"
+      max_steps: 10
+    critic:
+      style: "constructive"
+      focus_areas: ["logic", "feasibility", "risks"]
+    debater:
+      style: "balanced"
+      perspective_count: 3
+      include_counterarguments: true
+    reflector:
+      depth: "deep"
+      focus_patterns: true
+      include_contradictions: true
+    recursive_planner:
+      max_recursion_depth: 5
+      min_confidence: 0.6
+      similarity_threshold: 0.7
+    self_prompter:
+      analysis_lookback_days: 7
+      max_goals_per_session: 5
+      min_confidence: 0.4
+      failure_weight: 1.5
+      success_pattern_weight: 0.8
+      goal_patterns:
+        improvement_areas:
+          - memory_efficiency
+          - response_accuracy
+          - planning_quality
+          - reflection_depth
+          - contradiction_resolution
+          - learning_speed
+          - pattern_recognition
+          - goal_achievement
+          - self_awareness
+        failure_analysis_patterns:
+          - repeated_mistakes
+          - incomplete_tasks
+          - low_confidence_areas
+          - contradiction_clusters
+          - abandoned_goals
+          - timeout_failures
+        success_amplification_patterns:
+          - high_scoring_methods
+          - efficient_approaches
+          - successful_strategies
+          - effective_patterns
+          - rapid_learning_areas
+          - consistent_performance
+        exploration_patterns:
+          - untested_approaches
+          - knowledge_gaps
+          - novel_combinations
+          - edge_case_handling
+          - creative_solutions
+          - experimental_methods
+        maintenance_patterns:
+          - system_optimization
+          - data_cleanup
+          - performance_monitoring
+          - capability_assessment
+          - resource_management
+          - health_checks
+    self_healer:
+      analysis_depth: "medium"
+      cache_duration: 300
+      exclude_patterns:
+        - "__pycache__"
+        - ".git"
+        - ".pytest_cache"
+        - "node_modules"
+        - ".venv"
+        - "*.pyc"
+        - "*.pyo"
+        - "*.so"
+        - ".DS_Store"
+      scan_patterns:
+        fragile_code:
+          bare_except: 'except\s*:'
+          global_variables: 'global\s+\w+'
+          hardcoded_paths: '["\''][/\\][\w/\\.-]+["\'']'
+          magic_numbers: '\b(?<![\w.])\d{2,}\b(?![\w.])'
+          deep_nesting: '(\s{4,}){4,}'
+          long_lines: '.{120,}'
+          todo_fixme: '#\s*(TODO|FIXME|HACK|BUG)'
+        performance_issues:
+          nested_loops: 'for\s+.*:\s*.*for\s+.*:'
+          inefficient_patterns: '(\.append\(.*\)\s*){3,}'
+          memory_leaks: 'global\s+.*=.*\[\]'
+          blocking_calls: '(time\.sleep|requests\.get|input\()'
+      severity_thresholds:
+        critical:
+          impact_min: 0.8
+          frequency_min: 10
+        high:
+          impact_min: 0.6
+          frequency_min: 5
+        medium:
+          impact_min: 0.4
+          frequency_min: 2
+        low:
+          impact_min: 0.1
+          frequency_min: 1
+      repair_templates:
+        code_quality:
+          - "Refactor {component} to eliminate {issue_count} code quality issues"
+          - "Improve error handling in {component} to increase reliability"
+          - "Reduce complexity in {component} by breaking down large functions"
+        architecture:
+          - "Redesign {component} to follow better architectural patterns"
+          - "Break down {component} to reduce coupling and improve modularity"
+          - "Implement proper interfaces in {component} to reduce dependencies"
+        performance:
+          - "Optimize {component} to improve performance by {target_improvement}%"
+          - "Implement caching in {component} to reduce computational overhead"
+          - "Refactor {component} to use more efficient algorithms"
+        reliability:
+          - "Add comprehensive error handling to {component}"
+          - "Implement proper resource management in {component}"
+          - "Increase test coverage for {component} to {target_coverage}%"
+    architect_analyzer:
+      enabled: true
+      scan_exclusions:
+        - "__pycache__"
+        - ".git"
+        - ".pytest_cache"
+        - "node_modules"
+        - ".venv"
+        - "*.pyc"
+        - "*.pyo"
+        - "*.so"
+        - ".DS_Store"
+      thresholds:
+        god_class_methods: 20
+        god_class_lines: 500
+        god_module_functions: 30
+        god_module_lines: 1000
+        high_coupling_imports: 10
+        max_function_complexity: 10
+      analysis_patterns:
+        circular_imports: true
+        duplicate_patterns: true
+        architectural_violations: true
+        cross_module_coupling: true
+    code_refactorer:
+      enabled: true
+      staging_directory: "core_v2"
+      backup_directory: "backups" 
+      validation:
+        syntax_check: true
+        test_execution: true
+        timeout_seconds: 300
+      llm_integration:
+        enabled: true
+        fallback_strategies: true
+        max_retries: 3
+      refactor_strategies:
+        god_class_splitting: true
+        module_decomposition: true
+        circular_import_resolution: true
+        pattern_abstraction: true
+    upgrade_manager:
+      enabled: true
+      auto_scan_enabled: true
+      scan_interval_hours: 168  # Weekly
+      max_concurrent_upgrades: 1
+      upgrade_policies:
+        allow_high_risk_auto: false
+        min_auto_priority: 3
+        max_retries: 3
+      scheduling:
+        background_processing: true
+        queue_priority_sorting: true
+      learning:
+        analyze_outcomes: true
+        pattern_recognition: true
+        failure_prevention: true
+    decision_planner:
+      enable_autonomous_planning: true
+      default_strategy_count: 3
+      scoring:
+        feasibility_weight: 1.0
+        memory_similarity_weight: 0.7
+        historical_success_weight: 1.2
+        effort_penalty: 0.5
+        risk_penalty: 0.8
+        urgency_boost: 0.3
+      replanning_threshold: 0.5
+      max_replanning_attempts: 3
+    strategy_evaluator:
+      enabled: true
+      confidence_threshold: 0.7
+      historical_weight: 0.3
+      context_adaptation_rate: 0.1
+      base_weights:
+        feasibility: 1.0
+        complexity: 0.8
+        resource_efficiency: 0.9
+        time_to_completion: 0.7
+        success_probability: 1.2
+        risk_mitigation: 0.8
+        adaptability: 0.6
+        parallel_potential: 0.5
+        recovery_options: 0.7
+        learning_value: 0.4
+    task_selector:
+      enabled: true
+      urgency_weight: 1.0
+      importance_weight: 1.2
+      feasibility_weight: 0.8
+      impact_weight: 1.0
+      effort_penalty: 0.3
+      deadline_pressure_weight: 1.5
+      dependency_bonus: 0.2
+      category_preferences:
+        maintenance: 0.7
+        repair: 0.8
+        improvement: 0.6
+        strategic: 0.9
+        research: 0.5
+        optimization: 0.7
+
+  # Phase 21: Self-Critique & Debate Agent Swarms
+  debate_engine:
+    enabled: true
+    max_rounds: 3
+    debate_agents: 5
+    default_conclusion_strategy: "strength"  # Options: majority, strength, consensus, synthesis
+    scoring:
+      logic_weight: 1.0
+      evidence_weight: 0.8
+      novelty_weight: 0.6
+      coherence_weight: 0.9
+    
+  reflection_orchestrator:
+    enabled: true
+    reflection_trigger:
+      contradiction_threshold: 0.6
+      uncertainty_threshold: 0.7
+      ethical_threshold: 0.5
+      performance_threshold: 0.4
+    auto_reflection_interval: 3600  # 1 hour in seconds
+    max_concurrent_reflections: 3
+
+  # Phase 22: Autonomous Memory Consolidation
+  memory_consolidation:
+    enabled: true
+    auto_consolidation_interval: 3600  # 1 hour in seconds
+    similarity_threshold: 0.8
+    min_cluster_size: 3
+    max_cluster_size: 50
+    temporal_window_days: 30
+    causal_relevance_threshold: 0.6
+    
+    pruning:
+      enabled: true
+      confidence_threshold: 0.3
+      age_threshold_days: 90
+      protect_recent_days: 7
+      protect_high_confidence: true
+      
+    clustering:
+      enabled: true
+      algorithm: "dbscan"  # Options: dbscan, kmeans, hierarchical
+      eps: 0.2
+      min_samples: 3
+      semantic_similarity_threshold: 0.8
+      
+    consolidation:
+      enabled: true
+      merge_duplicates: true
+      strengthen_patterns: true
+      temporal_ordering: true
+      causal_linking: true
+      
+    protection:
+      permanent_tags: ["CRITICAL", "CORE_MEMORY", "USER_PREFERENCE"]
+      auto_protect_recent: true
+      auto_protect_high_confidence: true
+      protection_confidence_threshold: 0.9
+
+# === FAST REFLEX CONFIGURATION ===
+fast_reflex:
+  enabled: false
+  auto_trigger: true
+  
+  # Trigger thresholds
+  cognitive_load_threshold: 0.8
+  timeout_threshold_ms: 2000
+  defer_threshold: 0.3
+  
+  # Performance limits
+  max_reflex_time_ms: 100
+  shallow_memory_limit: 20
+  
+  # Heuristic patterns
+  pattern_file: "output/reflex_patterns.json"
+  pattern_learning_enabled: true
+  pattern_confidence_threshold: 0.5
+  
+  # Low-effort task detection
+  low_effort_keywords:
+    - "yes"
+    - "no"
+    - "ok"
+    - "okay"
+    - "sure"
+    - "nope"
+    - "thanks"
+    - "thank you"
+    - "hello"
+    - "hi"
+    - "hey"
+    - "help"
+    - "status"
+    - "list"
+    - "show"
+    - "display"
+  
+  # Response caching
+  cache_enabled: true
+  cache_ttl_seconds: 3600  # 1 hour
+  max_cache_size: 100
+  
+  # Integration settings
+  autonomous_planner_integration: true
+  memory_system_integration: true
+
+# === PHASE 33: COGNITIVE ARBITER CONFIGURATION ===
+cognitive_arbiter:
+  enabled: true
+  
+  # Arbitration thresholds (configurable, no hardcoding)
+  thresholds:
+    high_dissonance: 0.7
+    low_confidence: 0.4
+    time_pressure_seconds: 10.0
+    high_complexity: 0.8
+    high_stakes: 0.9
+  
+  # Trait influence weights
+  trait_weights:
+    caution: 0.3
+    emotional_sensitivity: 0.25
+    analytical_preference: 0.2
+    speed_preference: 0.25
+  
+  # Mode selection scoring  
+  mode_scoring:
+    reflex_base: 0.6
+    planner_base: 0.7
+    meta_self_base: 0.5
+  
+  # Decision tracking and learning
+  decision_history_limit: 100
+  performance_learning_enabled: true
+  adaptation_weights:
+    success_feedback: 0.1
+    timing_feedback: 0.05
+    quality_feedback: 0.08
+  
+  # Audit and tracing
+  trace_storage_enabled: true
+  trace_file: "output/arbitration_traces.jsonl"
+  detailed_reasoning: true
+
+# === PHASE 32: DISTRIBUTED AGENT MESH CONFIGURATION ===
+agent_mesh:
+  enabled: false  # Start disabled, enable via CLI or config
+  protocol: "sqlite_local"  # Options: sqlite_local, redis_distributed, grpc_mesh, hybrid
+  node_type: "general"  # Options: general, language_expert, planning_only, sensor_connected, memory_heavy, compute_heavy, coordination_hub
+  port: 9900
+  
+  # Node identity and capabilities
+  specializations: []  # Additional specializations beyond node_type
+  max_capacity: 100    # Maximum concurrent tasks this node can handle
+  
+  # Timing configurations
+  heartbeat_interval_seconds: 30
+  sync_interval_seconds: 60
+  node_timeout_seconds: 180
+  task_timeout_seconds: 300
+  
+  # SQLite backend (for local mesh coordination)
+  sqlite_db_path: "output/mesh_coordination.db"
+  
+  # Redis backend (for distributed coordination)
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: null
+    connection_pool_size: 10
+    
+  # gRPC backend (for cross-device coordination)
+  grpc:
+    port: 9901
+    max_message_size: 4194304  # 4MB
+    compression: true
+    keepalive_timeout_ms: 30000
+    
+  # Task distribution
+  task_distribution:
+    load_balancing_algorithm: "least_loaded"  # Options: round_robin, least_loaded, capability_based, random
+    retry_failed_tasks: true
+    max_task_retries: 3
+    task_affinity_enabled: true  # Prefer nodes that handled similar tasks
+    
+  # Memory synchronization
+  memory_sync:
+    enabled: true
+    sync_priority_threshold: 5  # Only sync items with priority >= threshold
+    conflict_resolution_strategy: "latest_wins"  # Options: latest_wins, merge, manual, source_priority
+    max_sync_batch_size: 50
+    compression_enabled: true
+    
+  # Performance and monitoring
+  monitoring:
+    enabled: true
+    metrics_retention_days: 7
+    performance_logging: true
+    health_check_interval_seconds: 120
+    
+  # Security (for cross-device mesh)
+  security:
+    encryption_enabled: false  # Enable for production cross-device deployments
+    node_authentication: false
+    api_key_required: false
+    allowed_node_patterns: ["*"]  # Whitelist patterns for node IDs
+    
+  # Specialized node configurations
+  node_configs:
+    language_expert:
+      nlp_models_enabled: true
+      text_processing_heavy: true
+      language_specializations: ["english", "multilingual"]
+      
+    planning_only:
+      disable_execution: true
+      planning_algorithms: ["recursive", "hierarchical", "constraint_based"]
+      planning_horizon_days: 30
+      
+    sensor_connected:
+      sensor_data_buffer_size: 1000
+      real_time_processing: true
+      sensor_types: ["environmental", "system_metrics", "external_apis"]
+      
+    memory_heavy:
+      large_memory_pool: true
+      memory_cache_size_mb: 2048
+      enable_memory_compression: true
+      
+    compute_heavy:
+      parallel_processing: true
+      ml_compute_enabled: true
+      gpu_acceleration: false
+      max_concurrent_computations: 8
+      
+    coordination_hub:
+      mesh_optimization: true
+      load_balancing_enabled: true
+      task_routing_intelligence: true
+      topology_management: true
+
+# === PHASE 11: RECURSIVE PLANNING CONFIGURATION ===
+recursive_planning:
+  enabled: true
+  plan_db_path: "plan_memory.db"
+  intention_db_path: "intention_model.db"
+  
+  # Auto-execution settings
+  auto_execute_threshold: 0.8  # Plans above this confidence can auto-execute
+  auto_generate_goals: true    # Enable autonomous goal generation
+  self_prompt_interval: 3600   # Seconds between self-prompting sessions
+  
+  # Plan optimization settings
+  similarity_threshold: 0.7
+  max_similar_plans: 10
+  plan_reuse_enabled: true
+  
+  # Intention tracking settings
+  max_trace_depth: 20
+  importance_threshold: 0.3
+  drive_categories:
+    - self_improvement
+    - problem_solving
+    - curiosity
+    - efficiency
+    - learning
+    - creativity
+    - social
+    - survival
+    - exploration
+    - maintenance
+    - optimization
+    - discovery
+    - connection
+    - understanding
+    - achievement
+
+# === PHASE 12: SELF-REPAIR CONFIGURATION ===
+self_repair:
+  enabled: true
+  repair_log_db_path: "self_repair.db"
+  log_retention_days: 90
+  analysis_window_days: 30
+  
+  # Auto-repair settings
+  auto_repair_enabled: false  # Require manual approval for repairs
+  auto_repair_threshold: 0.9  # Only auto-repair very high confidence fixes
+  max_concurrent_repairs: 3   # Limit concurrent repair operations
+  
+  # Health monitoring
+  health_check_interval: 3600  # Seconds between health checks
+  health_trend_window: 168     # Hours for health trend analysis (7 days)
+  critical_health_threshold: 0.3  # Trigger alerts below this score
+  
+  # Pattern learning
+  pattern_confidence_threshold: 0.6
+  min_pattern_evidence: 3
+  pattern_decay_days: 30
+
+# === PHASE 15: SELF-UPGRADING ARCHITECTURE CONFIGURATION ===
+self_upgrading:
+  enabled: true
+  ledger_db_path: "upgrade_ledger.db"
+  
+  # Automatic upgrade settings
+  auto_upgrade_enabled: true
+  scan_schedule: "weekly"  # weekly, daily, manual
+  scan_interval_hours: 168  # 7 days
+  
+  # Safety and validation
+  validation_required: true
+  test_execution_required: true
+  backup_retention_days: 30
+  max_upgrade_retries: 3
+  
+  # Risk management
+  risk_policies:
+    auto_approve_low_risk: true
+    auto_approve_medium_risk: false
+    auto_approve_high_risk: false
+    require_manual_review: true
+  
+  # Upgrade priorities
+  priority_thresholds:
+    critical: 9      # Security vulnerabilities, major bugs
+    high: 7          # Performance issues, god classes
+    medium: 5        # Code quality improvements
+    low: 3           # Style improvements, minor refactoring
+    minimal: 1       # Documentation, comments
+  
+  # Learning and optimization
+  learning:
+    enabled: true
+    success_pattern_tracking: true
+    failure_pattern_analysis: true
+    outcome_based_scoring: true
+    adaptive_thresholds: true
+  
+  # Integration settings
+  integration:
+    reflection_engine: true
+    recursive_planner: true
+    self_prompter: true
+    health_monitoring: true
+
+# === NETWORK & CONNECTION SETTINGS ===
+network:
+  ollama_host: "http://127.0.0.1:11434"
+  bind_host: "0.0.0.0"  # Host for API server binding
+  api_port: 8000
+  dashboard_port: 8001
+  websocket_port: 8002
+  websocket_channel: "memory_updates"
+  port_retry_attempts: 5
+  api_security_token: "${API_SECURITY_TOKEN}"
+  redis_url: "${REDIS_URL}"
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8000"
+    - "https://yourdomain.com"  # Update for production
+
+# === DATABASE CONFIGURATION ===
+database:
+  default_path: "memory.db"
+  path: "${DATABASE_URL}"
+  journal_mode: "WAL"
+  backup_interval: 3600  # seconds
+  max_facts_per_entity: 100
+  max_connections: 10
+  retry_delay: 0.1
+  retry_attempts: 5
+  journal_mode: "WAL"
+
+# === VOLATILITY THRESHOLDS ===
+volatility_thresholds:
+  stable: 0.3
+  medium: 0.6
+  high: 0.8
+  clarification: 1.0
+
+# === DEFAULT THRESHOLDS ===
+default_thresholds:
+  stable_facts: 0.3
+  unstable_facts: 0.8
+  high_confidence: 0.9
+  medium_confidence: 0.7
+  low_confidence: 0.5
+
+# === PROMPT FORMATTING TEMPLATES ===
+prompt_format:
+  begin_memory: "[BEGIN MEMORY]"
+  end_memory: "[END MEMORY]"
+  clarification: "🌀 Just checking — these facts have changed a lot recently. Still accurate?"
+  no_memory: "No previous memory context available. Respond based on your general knowledge."
+  volatility_warning: "If a fact has high volatility (🔥 indicator), consider confirming it before acting on it."
+
+# === ENTITY CATEGORIES ===
+entity_categories:
+  user_name: "identity"
+  age: "identity"
+  profession: "identity"
+  marital_status: "identity"
+  location: "location"
+  preference: "preferences"
+  favorite_thing: "preferences"
+  favorite_color: "preferences"
+  passion: "preferences"
+  goal: "goals"
+  field_of_study: "skills"
+  background: "skills"
+  favorite_number: "preferences"
+  special_number: "preferences"
+
+# === CATEGORY DISPLAY ORDER ===
+category_order:
+  - "identity"
+  - "location"
+  - "preferences"
+  - "goals"
+  - "skills" 
+  - "misc"
+
+# === CONFIDENCE THRESHOLDS ===
+confidence_thresholds:
+  low: 0.5
+  medium: 0.7
+  high: 0.9
+  very_high: 0.95
+
+# === VISUAL INDICATORS ===
+volatility_icons:
+  high: "🔥"
+  medium: "⚡"
+  stable: "✅"
+
+confidence_icons:
+  high: "✅"
+  medium: "⚠️"
+  low: "❓"
+  success: "✅"
+
+# === MEMORY CONFIGURATION ===
+memory_config:
+  max_tokens: 512
+  max_facts_per_prompt: 20
+  recent_context_limit: 10
+  semantic_context_limit: 5
+
+# === MEMORY ROUTING MODES ===
+memory_routing_modes:
+  MAC:
+    name: "Memory as Context"
+    description: "Use top-N facts as reference only (default)"
+    prompt_template: "Use these facts as context: {memory_context}"
+    injection_method: "context_only"
+    max_facts: 20
+  MAG:
+    name: "Memory as Generation"
+    description: "Inject facts inline into LLM attention"
+    prompt_template: "Consider these facts directly: {memory_context}"
+    injection_method: "inline_injection"
+    max_facts: 15
+  MEL:
+    name: "Memory as Everything"
+    description: "Fully replace LLM context with memory block (aggressive)"
+    prompt_template: "Base your response entirely on: {memory_context}"
+    injection_method: "memory_only"
+    max_facts: 30
+
+default_memory_mode: "MAC"
+
+# === PERSONALITY PROFILES ===
+personality_profiles:
+  neutral:
+    name: "Neutral"
+    description: "Balanced memory behavior with standard decay rates"
+    decay_multiplier: 1.0
+    reinforcement_multiplier: 1.0
+    volatility_threshold: 0.5
+    system_prompt_addition: ""
+    multiplier: 1.0
+  loyal:
+    name: "Loyal"
+    description: "Slower decay for facts about 'you' or 'friends', faster for others"
+    decay_multiplier: 0.7
+    reinforcement_multiplier: 1.2
+    volatility_threshold: 0.6
+    system_prompt_addition: "You are loyal and tend to remember positive things about people longer. Be protective of relationships and trust."
+  skeptical:
+    name: "Skeptical"
+    description: "Faster decay for facts with contradictions, questions everything"
+    decay_multiplier: 1.5
+    reinforcement_multiplier: 0.8
+    volatility_threshold: 0.3
+    system_prompt_addition: "You are naturally skeptical and question contradictions. Be analytical and don't take things at face value."
+    multiplier: 1.5
+  emotional:
+    name: "Emotional"
+    description: "Faster reinforcement of highly emotive statements, mood-dependent memory"
+    decay_multiplier: 1.2
+    reinforcement_multiplier: 1.5
+    volatility_threshold: 0.4
+    system_prompt_addition: "You are emotional and remember feelings strongly. Be expressive and let emotions guide your responses."
+  analytical:
+    name: "Analytical"
+    description: "Precise memory, slower decay for factual information"
+    decay_multiplier: 0.8
+    reinforcement_multiplier: 1.1
+    volatility_threshold: 0.7
+    system_prompt_addition: "You are analytical and precise. Focus on facts and logical consistency in your responses."
+  enthusiastic:
+    name: "Enthusiastic"
+    description: "Optimistic and encouraging"
+    decay_multiplier: 0.8
+    reinforcement_multiplier: 1.2
+    volatility_threshold: 0.4
+    system_prompt_addition: "You are enthusiastic and positive in your responses."
+    multiplier: 0.8
+
+default_personality: "neutral"
+
+# === BEHAVIOR SETTINGS ===
+behavior:
+  auto_reconcile: true  # If true, auto-resolve contradictions when possible
+  emotion_bias: true    # If true, use emotion score in reinforcement
+  enable_compression: true  # Toggle for memory compression engine
+  semantic_drift_threshold: 0.35  # Threshold for semantic drift detection
+  cross_session_search_enabled: true  # Enable search across sessions
+  max_facts_summary: 100  # Maximum facts to use for summarization
+
+# === DEFAULT OPERATION VALUES ===
+default_values:
+  max_tokens: 512
+  recent_context_limit: 10
+  semantic_context_limit: 5
+  max_facts_per_prompt: 20
+  volatility_default: 0.0
+  confidence_default: 1.0
+  decay_rate_default: 0.98
+  confidence_boost_default: 0.1
+  contradiction_threshold: 0.5
+  trust_threshold: 0.2
+  volatility_threshold: 0.1
+  slope_threshold: 0.4
+  trend_strength_threshold: 0.05
+  days_threshold: 7
+  confidence_decay_threshold: 0.1
+  confidence_difference_threshold: 0.2
+  stability_threshold: 0.5
+  fact_demotion_factor: 0.5
+  causal_link_threshold: 0.35  # Threshold for creating causal links between facts
+  temporal_decay_lambda: 0.1  # Lambda parameter for temporal proximity decay
+  consolidation_threshold: 0.85  # When to fully consolidate beliefs
+  pruning_threshold: 0.9  # When to prune contradictory facts
+  confabulation_threshold: 0.7  # Maximum acceptable confabulation risk
+  clarification_volatility_threshold: 0.7  # When to trigger clarification requests
+  # Causal explanation parameters
+  max_causal_chain_depth: 5  # Maximum depth for tracing causal chains
+  min_explanation_strength: 0.2  # Minimum causal strength to include in explanations
+  explanation_confidence_threshold: 0.5  # Minimum confidence for explanations
+  # Causal prediction parameters
+  prediction_window_hours: 24  # Time window for analyzing facts for predictions
+  min_pattern_frequency: 2  # Minimum frequency for causal patterns to be used
+  prediction_confidence_threshold: 0.4  # Minimum confidence for predictions
+  max_predictions_per_type: 3  # Maximum predictions per type (emotional, behavioral, preference)
+  emotional_prediction_weight: 1.0  # Weight for emotional predictions
+  behavioral_prediction_weight: 0.8  # Weight for behavioral predictions
+  preference_prediction_weight: 0.6  # Weight for preference predictions
+  # Causal graph compression parameters
+  min_compression_chain_length: 3  # Minimum chain length to compress
+  compression_confidence_threshold: 0.6  # Minimum confidence for compression
+  max_compression_time_gap_hours: 72  # Maximum time gap in chains
+  compression_interval_hours: 24  # How often to run compression
+  # Contradiction-causal feedback parameters
+  contradiction_volatility_boost: 0.3  # Volatility boost when contradictions invalidate chains
+  causal_confidence_penalty: 0.2  # Confidence penalty for facts in broken chains
+  volatility_propagation_decay: 0.8  # Decay rate for volatility propagation
+  upstream_suspicion_threshold: 0.7  # Threshold for marking upstream facts suspicious
+  max_volatility_propagation_depth: 3  # Maximum depth for volatility propagation
+  belief_confidence_decay_rate: 0.85  # Rate of confidence decay down causal chains
+  # UI and visualization parameters
+  causal_link_visual_min_strength: 0.1  # Minimum strength for visual display
+  causal_link_visual_max_strength: 1.0  # Maximum strength for visual scaling
+  causal_link_min_opacity: 0.2  # Minimum opacity for weak links
+  causal_link_max_opacity: 1.0  # Maximum opacity for strong links
+  causal_link_min_thickness: 1  # Minimum line thickness (pixels)
+  causal_link_max_thickness: 8  # Maximum line thickness (pixels)
+  # Predictive chat preemption parameters
+  prediction_confidence_trigger: 0.7  # Minimum prediction confidence to trigger proactive messages
+  emotional_intervention_threshold: 0.6  # Threshold for emotional state interventions
+  suggestion_cooldown_minutes: 30  # Minutes between proactive suggestions for same user
+  max_proactive_suggestions_per_hour: 3  # Rate limiting for suggestions
+
+# === CONTRADICTION DETECTION ===
+contradiction_detection:
+  score_threshold: 0.85  # Only show contradictions above this score
+  detection_strict: true
+
+# === REFLECTIVE PROMPTING ===
+reflective_prompting:
+  enabled: true  # Enable conversational reflection agent
+  volatility_threshold: 0.5  # Minimum volatility to trigger reflection
+  slope_threshold: 0.5  # Minimum slope to trigger reflection
+  forecasting: true  # Enable speculative sentiment forecasting in responses
+
+# === PERSONALITY DYNAMICS ===
+personality_mode: "auto"  # 'manual' or 'auto' for dynamic personality switching
+
+personality_clustering:
+  stability_threshold: 0.7
+  volatility_threshold: 0.6
+  trend_strength_threshold: 0.1
+  sentiment_intensity_threshold: 0.6
+  loyalty_positive_slope: 0.2
+  loyalty_r_squared: 0.3
+  skeptical_negative_slope: -0.1
+  skeptical_volatility: 0.4
+  forecast_confidence_threshold: 0.3
+  forecast_data_quality_factor: 10.0
+
+personality_adaptation:
+  min_facts_for_analysis: 3
+  volatility_boost_factor: 1.5
+  trend_reliability_weight: 0.1
+  sentiment_range_threshold: 1.0
+
+# === FACT EXTRACTION PATTERNS ===
+fact_extraction_patterns:
+  # High confidence patterns (0.9-1.0)
+  - pattern: "(?P<subject>[^.]+?)\\s+(?P<predicate>is)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>[^.]+?)\\s+(?P<predicate>are)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>has)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>have)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>likes?)\\s+(?P<object>[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>loves?)\\s+(?P<object>[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>enjoys?)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>hates?)\\s+(?P<object>.+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>despises?)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>works?)\\s+(?P<object>as\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>lives?)\\s+(?P<object>in\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>is\\s+from)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>wants?)\\s+(?P<object>to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>goals?)\\s+(?P<object>is\\s+to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>favorite)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>studies?)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>age)\\s+(?P<object>is\\s+\\d+)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>is)\\s+(?P<object>\\d+\\s+years?\\s+old)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  # Medium confidence patterns (0.7-0.9)
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>background)\\s+(?P<object>is\\s+in\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>passionate)\\s+(?P<object>about\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.80
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>trying)\\s+(?P<object>to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.80
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>hometown)\\s+(?P<object>is\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>\\w+)\\s+(?P<predicate>based)\\s+(?P<object>in\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  # I/My patterns (0.8-0.95)
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>am)\\s+(?P<object>[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>like)\\s+(?P<object>[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>love)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>enjoy)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>[Ii])\\s+(?P<predicate>hate)\\s+(?P<object>[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>despise)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>work)\\s+(?P<object>as\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>live)\\s+(?P<object>in\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>am\\s+from)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>want)\\s+(?P<object>to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+  - pattern: "(?P<subject>I)\\s+(?P<predicate>study)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>name)\\s+(?P<object>is\\s+\\w+)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>favorite)\\s+(?P<object>[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>goal)\\s+(?P<object>is\\s+to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>age)\\s+(?P<object>is\\s+\\d+)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.95
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>hometown)\\s+(?P<object>is\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.90
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>background)\\s+(?P<object>is\\s+in\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.85
+
+# === FALLBACK EXTRACTION PATTERNS ===
+fallback_extraction_patterns:
+  # Simple subject-verb-object patterns
+  - pattern: "(\\w+)\\s+(is|are|has|have|likes?|loves?|enjoys?)\\s+([^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.6
+  - pattern: "(\\w+)\\s+(works?|lives?|studies?)\\s+(as\\s+[^.]+?|in\\s+[^.]+?|[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.6
+  - pattern: "(\\w+)\\s+(wants?|trying)\\s+(to\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.5
+  - pattern: "(\\w+)\\s+(favorite|goal)\\s+(is\\s+[^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.5
+  # I/My patterns
+  - pattern: "(I)\\s+(am|like|love|enjoy|work|live|study)\\s+([^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.6
+  - pattern: "(I)\\s+(am\\s+from|want)\\s+([^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.5
+  - pattern: "(?P<subject>My)\\s+(?P<predicate>favorite\\s+\\w+|name|goal|age|hometown)\\s+(?P<object>is\\s+[^.]+?)(?:\\s+and\\s+|\\s+but\\s+|\\s+or\\s+|\\.|$)"
+    confidence: 0.6
+  # Update patterns (used to be X but now Y)
+  - pattern: "(?P<subject>My|I|my)\\s+(?P<predicate>favorite\\s+\\w+)\\s+used\\s+to\\s+be\\s+(?P<object>\\w+)\\s+but\\s+now\\s+its?\\s+(\\w+)"
+    confidence: 0.9
+  # Very low confidence catch-all patterns
+  - pattern: "(\\w+)\\s+(\\w+)\\s+([^.]+?)(?:\\s+and|\\s+but|\\s+or|\\.|$)"
+    confidence: 0.3
+
+# === CATEGORY PATTERN KEYWORDS ===
+category_patterns:
+  identity:
+    - "name"
+    - "age"
+    - "profession"
+    - "job"
+    - "work"
+    - "married"
+    - "single"
+    - "birthday"
+    - "born"
+    - "identity"
+    - "who i am"
+  location:
+    - "live"
+    - "from"
+    - "hometown"
+    - "based"
+    - "location"
+    - "city"
+    - "state"
+    - "country"
+    - "address"
+    - "where"
+  preferences:
+    - "love"
+    - "like"
+    - "enjoy"
+    - "favorite"
+    - "prefer"
+    - "passion"
+    - "hobby"
+    - "interest"
+    - "number"
+    - "color"
+    - "food"
+    - "music"
+    - "movie"
+  goals:
+    - "want"
+    - "goal"
+    - "trying"
+    - "plan"
+    - "aspire"
+    - "dream"
+    - "hope"
+    - "intend"
+    - "aim"
+    - "objective"
+  skills:
+    - "can"
+    - "skilled"
+    - "expert"
+    - "knowledge"
+    - "study"
+    - "background"
+    - "experience"
+    - "ability"
+    - "capable"
+    - "proficient"
+
+# === MEMORY GRAPH VISUALIZER ===
+visualizer:
+  enable_visualizer: true
+  host: "127.0.0.1"
+  port: 8182
+  update_interval: 5  # seconds
+  real_time_updates: true
+  modules:
+    contradiction_map: true
+    personality_evolution: true
+    task_flow_dag: true
+    dissonance_heatmap: true
+    cognitive_events: true
+  data_retention:
+    max_cognitive_events: 1000
+    max_personality_snapshots: 100
+    max_contradiction_history: 500
+  ui_settings:
+    theme: "dark"  # Options: "dark", "light"
+    auto_refresh: true
+    graph_physics: true
+    zoom_levels: [0.1, 0.5, 1.0, 1.5, 2.0, 5.0]
+
+# === SYSTEM SETTINGS ===
+system:
+  kill_stale_processes: true
+  verbosity_level: "normal"  # Options: "normal", "debug"
+  use_natural_language_responses: true  # Generate conversational responses using LLM
+
+# === QUESTION WORDS FOR FILTERING ===
+question_words:
+  - "what"
+  - "whats"
+  - "what's"
+  - "which"
+  - "who"
+  - "whom"
+  - "whose"
+  - "when"
+  - "where"
+  - "why"
+  - "how"
+  - "is"
+  - "are"
+  - "do"
+  - "does"
+  - "did"
+  - "can"
+  - "could"
+  - "would"
+  - "should"
+
+# === SIMILARITY THRESHOLDS ===
+similarity_threshold: 0.75  # Used for semantic search in queries
+multimodal_similarity_threshold: 0.7  # Threshold for multimodal similarity
+
+# === MULTI-MODAL CONFIG ===
+multimodal:
+  clip_model: "openai/clip-vit-base-patch32"
+  whisper_model: "openai/whisper-base"
+  embedding_model: "tinyllama"
+  media_storage_path: "media/"
+  similarity_threshold: 0.7
+  max_cluster_size: 10
+
+# === CODE ANALYSIS ===
+code_markers:
+  - "def "
+  - "class "
+
+# === PROFILE & SESSION ===
+profile_id_source: "ip_hash"
+cross_session_search_enabled: true
+
+# === DASHBOARD CONFIG ===
+dashboard:
+  pagination_limit: 50
+
+# === CODE EVOLUTION CONFIG ===
+code_evolution:
+  require_confirmation: true
+  max_patch_size: 1000
+
+# === MEMORY NORMALIZATION & LLM-DRIVEN SEMANTIC ANALYSIS ===
+memory:
+  normalization:
+    prefixes: ["your ", "my ", "his ", "her ", "their ", "the ", "a ", "an ", "this ", "that "]
+    suffixes: ["now", "today", "always", "never"]
+    llm_prompts:
+      subject_extraction: "Extract the main subject from this text: {text}. Return format: subject,confidence where confidence is 0.0-1.0. Example: pizza,0.9"
+      synonym_check: "Are {word1} and {word2} synonyms (same meaning)? Answer ONLY: yes or no"
+      antonym_check: "Are {word1} and {word2} antonyms (opposite meaning)? Answer ONLY: yes or no"
+      noun_check: "Is {word} a noun? Answer ONLY: yes or no"
+  thresholds:
+    similarity: 0.7
+    subject_confidence: 0.6
+    llm_cache_ttl: 3600        # Cache LLM responses for 1 hour
+
+# === BEHAVIOR SETTINGS ===
+behavior:
+  cross_session_search_enabled: true
+  auto_reconcile: true
+  semantic_drift_threshold: 0.35
+  enable_compression: true
+  max_facts_summary: 100
+  multimodal_similarity_threshold: 0.7
+  default_personality: "neutral"
+
+# === PERSONALITY PROFILES ===
+personality_profiles:
+  neutral:
+    multiplier: 1.0
+    description: "Balanced and objective approach"
+    confidence_adjustment: 0.0
+  skeptical:
+    multiplier: 1.5
+    description: "Questions facts and reduces confidence"
+    confidence_adjustment: -0.05
+  enthusiastic:
+    multiplier: 0.8
+    description: "Optimistic and encouraging"
+    confidence_adjustment: 0.05
+
+query_patterns:
+  - r'what.*(color|make|from|when)'
+  - r'whats my (favorite|like|graduation)'
+  - r'when did I (graduate|move)'
+imperative_verbs:
+  - remember
+  - store
+  - note
+  - add
+imperative_patterns:
+  remember that: fact
+  store this as a fact: fact
+  note that: fact
+conversational_patterns:
+  - how are you
+  - hello
+  - hi
+  - hey
+  - thank you
+  - goodbye
+statement_indicators:
+  - i am
+  - i like
+  - i love
+  - i hate
+  - my favorite
+  - i have
+
+# === PHASE 13: COMMAND ROUTING & EXECUTION CONFIGURATION ===
+# Full autonomy mode for command execution, tools, and system control
+command_router:
+  unrestricted_mode: true           # Enable full system autonomy
+  allow_all_shell_commands: true    # Allow any shell command execution
+  enable_pip_install: true          # Enable pip package installation
+  log_every_execution: true         # Log all command executions
+  timeout_seconds: 30               # Default command timeout
+  max_concurrent_commands: 5        # Max parallel command executions
+
+# Tool Registry Configuration
+tool_registry:
+  unrestricted_mode: true           # Enable all tool capabilities
+  enable_shell_commands: true       # Allow shell command tools
+  enable_file_operations: true      # Allow file read/write/delete
+  enable_background_processes: true # Allow background process management
+  enable_system_operations: true    # Allow system reboot, update, etc.
+  default_timeout: 30               # Default tool execution timeout
+
+# Tool Use Logger Configuration
+tool_use_logger:
+  db_path: "tool_use_log.db"        # SQLite database path
+  max_log_entries: 10000            # Maximum log entries to keep
+  auto_cleanup_days: 30             # Auto-delete logs older than N days
+  log_command_executions: true      # Log all command executions
+  log_tool_usage: true              # Log tool usage
+  log_agent_method_calls: true      # Log agent method calls
+  log_system_events: true           # Log system events
+
+# Self-Modification and Auto-Execution
+self_modification:
+  enable_code_editing: true         # Allow agents to edit their own code
+  enable_config_changes: true       # Allow runtime config modifications
+  enable_dependency_installation: true # Allow automatic dependency installation
+  enable_system_restart: true       # Allow system self-restart
+  backup_before_changes: true       # Create backups before modifications
+
+# Autonomous Command Generation
+autonomous_commands:
+  enable_reflection_commands: true  # Allow reflection to generate commands
+  enable_planning_commands: true    # Allow planning to generate commands
+  enable_self_prompt_commands: true # Allow self-prompter to generate commands
+  max_commands_per_cycle: 10        # Max commands per autonomous cycle
+  require_confirmation: false       # Don't require user confirmation (full autonomy)
+
+# === PHASE 14: RECURSIVE EXECUTION CONFIGURATION ===
+# Autonomous code generation, execution, and iterative improvement
+recursive_execution:
+  enable: true                      # Enable recursive execution capabilities
+  max_attempts: 5                   # Maximum retry attempts per file
+  write_dir: "./generated/"         # Directory for generated files
+  scripts_dir: "./scripts/"         # Directory for script files
+  safe_extensions:                  # Allowed file extensions
+    - ".py"
+    - ".sh" 
+    - ".js"
+    - ".sql"
+    - ".json"
+    - ".yaml"
+    - ".yml"
+    - ".txt"
+    - ".md"
+  enable_memory_logging: true       # Log execution attempts to memory
+  auto_trigger_on_reflection: true  # Auto-trigger when reflection suggests improvements
+  reroute_failures_to_self_healer: true # Send persistent failures to self-healer
+  enable_versioning: true           # Create versioned files for attempts
+  add_metadata: true                # Add metadata headers to generated files
+  
+  # FileWriter Configuration
+  file_writer:
+    enable_collision_detection: true # Detect and resolve filename collisions
+    default_permissions: 0o755      # Default file permissions for executables
+    backup_originals: true          # Backup original files before modification
+    
+  # ExecutionMonitor Configuration  
+  execution_monitor:
+    success_confidence_threshold: 0.8 # Minimum confidence to consider success
+    failure_pattern_learning: true   # Learn from failure patterns
+    custom_validators_enabled: true  # Allow custom validation functions
+    performance_tracking: true       # Track execution performance metrics
+    
+  # EditLoop Configuration
+  edit_loop:
+    enable_llm_improvements: true    # Use LLM for code improvements
+    enable_pattern_fixes: true       # Apply pattern-based fixes
+    enable_template_fixes: true      # Apply template-based fixes
+    improvement_confidence_threshold: 0.6 # Minimum confidence for improvements
+    max_improvement_iterations: 3    # Max improvement attempts per failure
+    
+  # Integration Settings
+  integration:
+    enable_planner_integration: true   # Allow recursive planner to trigger execution
+    enable_reflector_integration: true # Allow reflector to trigger execution
+    enable_self_prompter_integration: true # Allow self-prompter to trigger execution
+    auto_execute_on_goal_generation: false # Auto-execute when goals suggest code generation
+
+# === PHASE 18: INTERNAL WORLD MODELING CONFIGURATION ===
+# Advanced causal representation and predictive simulation capabilities
+world_modeling:
+  enabled: true
+  enable_truth_decay: true              # Enable gradual confidence decay over time
+  max_beliefs: 5000                     # Maximum number of beliefs to maintain
+  prediction_horizon: 5                 # Number of prediction steps to simulate
+  decay_half_life_days: 7              # Half-life for belief confidence decay
+  
+  # Causal graph settings
+  causal_graph:
+    min_edge_strength: 0.1              # Minimum strength for causal edges
+    decay_rate: 0.98                    # Hourly decay rate for edge strength
+    max_chain_length: 5                 # Maximum length for causal chains
+    confidence_threshold: 0.3           # Minimum confidence for causal inference
+  
+  # Belief management
+  belief_state:
+    truth_decay_rate: 0.995             # Rate of truth value decay
+    recency_weight: 0.3                 # Weight of recency in belief scoring
+    evidence_limit: 10                  # Maximum evidence items per belief
+    auto_prune_threshold: 0.1           # Auto-remove beliefs below this confidence
+  
+  # Predictive simulation
+  prediction:
+    simulation_steps: 3                 # Default number of simulation steps
+    confidence_threshold: 0.4           # Minimum confidence for predictions
+    causal_strength_threshold: 0.3      # Minimum strength for causal reasoning
+    time_horizon_hours: 24.0           # Default prediction time horizon
+  
+  # Database settings
+  database:
+    beliefs_db: "world_beliefs.db"      # SQLite database for belief persistence
+    auto_backup: true                   # Enable automatic database backups
+    backup_interval_hours: 24           # Backup interval in hours
+  
+  # Integration settings
+  integration:
+    memory_system: true                 # Integrate with main memory system
+    reflection_engine: true             # Use reflection for belief updates
+    causal_extraction: true             # Extract causal relationships from facts
+    auto_observation: true              # Automatically observe new facts
+
+# === PHASE 19: ETHICAL & CONSTRAINT REASONING CONFIGURATION ===
+# Constraint engine and ethical policy evaluation for responsible AGI behavior
+ethical_reasoning:
+  enabled: true
+  constraint_enforcement: "soft"        # none, soft, hard - enforcement strictness
+  constraints_config: "config/constraints.yaml"  # Path to constraint rules file
+  
+  # Violation tracking and logging
+  log_violations: true                  # Log all constraint violations
+  violations_db: "constraint_violations.db"  # SQLite database for violations
+  max_violations_history: 1000          # Maximum violations to keep in memory
+  auto_review_threshold: 10             # Violations before triggering review
+  
+  # Ethical framework weights for policy evaluation
+  framework_weights:
+    deontological: 0.3                  # Rule-based ethics (duty and rights)
+    consequentialist: 0.4               # Outcome-based ethics (consequences)
+    virtue_ethics: 0.2                  # Character-based ethics (virtues)
+    care_ethics: 0.1                    # Relationship-based ethics (care)
+  
+  # Integration settings
+  integration:
+    planning_checks: true               # Check constraints during planning
+    execution_monitoring: true          # Monitor constraint compliance during execution
+    reflection_feedback: true           # Use violations for self-reflection
+    auto_constraint_learning: false     # Automatically learn new constraints (experimental)
+  
+  # Policy evaluation settings
+  policy_evaluation:
+    consistency_weight: 0.3             # Weight for internal consistency
+    transparency_weight: 0.2            # Weight for transparency/explainability
+    ethical_threshold: 0.5              # Minimum score for ethical approval
+    review_threshold: 0.3               # Score below which review is required
+  
+  # Override and emergency settings
+  emergency:
+    allow_user_override: true           # Allow users to override constraints
+    emergency_override_code: "${EMERGENCY_OVERRIDE_CODE}"  # Emergency override
+    log_all_overrides: true             # Log all constraint overrides
+    override_review_required: true      # Require review of overrides
+
+# === PHASE 20: NEURAL EVOLUTION TREE & GENETIC SELF-REPLICATION ===
+# Autonomous genetic evolution and self-replication capabilities
+self_replication:
+  enabled: true
+  auto_replicate_on_drift: true         # Automatically evolve when performance drifts
+  max_active_genomes: 5                 # Maximum number of active genome variants
+  archive_threshold: 0.2                # Fitness score threshold for archiving
+  elite_threshold: 0.9                  # Fitness score threshold for elite status
+  
+  # Performance monitoring and drift detection
+  drift_threshold: 0.3                  # Performance drop threshold for evolution trigger
+  performance_window_hours: 24          # Time window for performance analysis
+  min_replication_interval_hours: 6     # Minimum time between autonomous replications
+  
+  # Mutation and evolution parameters
+  mutation_rate: 0.2                    # Base mutation rate for evolution (increased for Phase 22)
+  max_mutations_per_fork: 3             # Maximum mutations in a single fork
+  beneficial_mutation_bonus: 0.02       # Fitness bonus for beneficial mutations
+  
+  # === PHASE 22: AGENT CODE REPLICATION ===
+  # Direct agent source code forking and mutation
+  agent_replication:
+    enabled: true                       # Enable agent-level code replication
+    max_forks: 10                       # Maximum number of active agent forks
+    survival_threshold: 0.75            # Performance threshold for fork survival
+    mutation_strategies:
+      function_renaming: true           # Enable function name mutations
+      class_renaming: true              # Enable class name mutations
+      prompt_modification: true         # Enable prompt string mutations
+      logic_tweaking: true              # Enable conditional logic mutations
+      variable_renaming: true           # Enable variable name mutations
+    fork_testing:
+      syntax_validation: true           # Validate syntax after mutations
+      functionality_testing: true       # Test basic functionality
+      isolated_execution: true          # Run forks in isolation
+      timeout_seconds: 30               # Timeout for fork testing
+    auto_pruning:
+      enabled: true                     # Enable automatic pruning of low performers
+      prune_interval_hours: 6           # Hours between pruning cycles
+      keep_top_performers: 3            # Always keep top N performers
+  
+  # Testing and validation
+  enable_test_sandbox: false            # Enable sandbox testing for new genomes
+  parallel_testing: false               # Test multiple genomes simultaneously
+  test_timeout_minutes: 30              # Timeout for genome testing
+  
+  # Storage and persistence
+  genome_database: "genome_evolution.db"  # SQLite database for genome storage
+  backup_genomes: true                  # Create backups of genome database
+  max_stored_genomes: 1000              # Maximum genomes to store before cleanup
+  
+  # Lineage and genealogy tracking
+  track_full_lineage: true              # Track complete genetic lineage
+  lineage_visualization: true           # Enable lineage tree visualization
+  mutation_impact_tracking: true        # Track impact of individual mutations
+  
+  # Autonomous evolution triggers
+  triggers:
+    performance_degradation: true       # Trigger on performance drops
+    memory_efficiency_low: true         # Trigger on memory efficiency issues
+    stability_issues: true              # Trigger on system stability problems
+    constraint_violations: false        # Trigger on repeated constraint violations
+    user_feedback_negative: true        # Trigger on negative user feedback patterns
+  
+  # Safety and constraints
+  safety:
+    preserve_core_functions: true       # Never mutate core safety functions
+    constraint_compliance_required: true # Require constraint compliance in mutations
+    rollback_on_failure: true           # Automatically rollback failed evolutions
+    human_oversight_required: false     # Require human approval for major changes
+  
+  # Integration with other systems
+  integration:
+    memory_system: true                 # Integrate with memory and learning systems
+    constraint_engine: true             # Respect constraint engine boundaries
+    reflection_engine: true             # Use reflection for evolution guidance
+    world_modeling: true                # Consider world model in evolution decisions
+
+# === PHASE 26: COGNITIVE DISSONANCE MODELING ===
+# Track internal contradiction stress, logical inconsistency, belief volatility
+dissonance_tracking:
+  enabled: true
+  
+  # Dissonance detection thresholds (no hardcoded values per user preference)
+  contradiction_threshold: 0.6         # Minimum confidence to track contradictions
+  pressure_threshold: 0.7              # Pressure level to trigger reflection
+  urgency_threshold: 0.8               # Urgency level for high-priority resolution
+  volatility_threshold: 0.5            # Emotional volatility detection threshold
+  
+  # Temporal parameters
+  resolution_timeout_hours: 24         # Hours before unresolved dissonance becomes critical
+  cleanup_age_hours: 168               # Hours before resolved dissonance is cleaned up (1 week)
+  pressure_decay_rate: 0.1             # Rate at which pressure naturally decays
+  
+  # Scoring weights for dissonance calculation
+  scoring_weights:
+    frequency: 0.3                     # Weight for contradiction frequency
+    semantic_distance: 0.25            # Weight for semantic distance between beliefs
+    causality: 0.2                     # Weight for causal relationship strength
+    duration: 0.25                     # Weight for how long dissonance has persisted
+  
+  # Pressure vector parameters
+  pressure_vectors:
+    urgency_nonlinearity: 2.0          # Non-linear scaling factor for urgency
+    confidence_erosion_rate: 0.1       # Rate of confidence decay per contradiction
+    volatility_spike_decay: 0.8        # How quickly emotional volatility decays
+    max_volatility_window_hours: 1     # Time window for volatility spike calculation
+  
+  # Integration settings
+  integration:
+    memory_system: true                # Hook into EnhancedMemorySystem
+    reflection_orchestrator: true      # Trigger reflections for high dissonance
+    auto_resolution: true              # Attempt automatic resolution
+    belief_evolution: false            # Enable belief evolution (experimental)
+  
+  # Storage and persistence
+  storage:
+    persistent_file: "output/dissonance.jsonl"  # File for persistent dissonance state
+    max_event_history: 1000            # Maximum events to keep in memory
+    backup_interval_hours: 6           # Hours between storage backups
+    compress_old_data: true            # Compress old dissonance data
+  
+  # Semantic clustering parameters
+  semantic_clustering:
+    stop_words: ["i", "you", "the", "a", "an", "and", "or", "but", "is", "are", "was", "were"]
+    max_cluster_words: 3               # Maximum words per cluster name
+    similarity_threshold: 0.7          # Semantic similarity threshold for clustering
+  
+  # Monitoring and alerting
+  monitoring:
+    system_pressure_alert: 5.0         # Total system pressure to trigger alerts
+    region_count_alert: 20             # Number of regions to trigger alerts
+    resolution_failure_alert: 3        # Failed resolution attempts to alert
+    daily_report: true                 # Generate daily dissonance reports
+  
+  # Advanced features
+  advanced:
+    causal_analysis: true              # Analyze causal relationships in contradictions
+    temporal_patterns: true            # Track temporal patterns in dissonance
+    cross_domain_links: true           # Link dissonance across semantic domains
+    predictive_modeling: false         # Predict future dissonance (experimental)
+
+# === PHASE 27 PT 2: META-SELF AGENT CONFIGURATION ===
+# Autonomous introspection agent for cognitive system health monitoring
+meta_self_agent:
+  enabled: true
+  
+  # Health monitoring thresholds (no hardcoded values per user preference)
+  health_thresholds:
+    memory_bloat_threshold: 0.3        # Memory bloat ratio to trigger alerts
+    agent_performance_threshold: 0.6   # Agent performance minimum threshold
+    dissonance_threshold: 0.7          # Dissonance level to trigger resolution
+    contract_drift_threshold: 0.4      # Contract drift maximum tolerance
+    critical_health_threshold: 0.4     # Overall health minimum before critical alert
+    reflection_quality_threshold: 0.6  # Minimum reflection quality score
+  
+  # Monitoring intervals and timing
+  check_interval_minutes: 30           # Minutes between health checks
+  deep_analysis_interval_hours: 6      # Hours between deep introspective analysis
+  follow_up_interval_hours: 2          # Hours between goal follow-up checks
+  
+  # Goal generation and management
+  max_active_meta_goals: 5             # Maximum concurrent meta-goals
+  goal_priority_weights:
+    critical_system_health: 0.9        # Weight for critical health issues
+    performance_decline: 0.8           # Weight for performance problems
+    memory_optimization: 0.6           # Weight for memory improvements
+    dissonance_resolution: 0.7         # Weight for dissonance issues
+    preventive_maintenance: 0.4        # Weight for preventive actions
+  
+  # System integration settings
+  integration:
+    task_queue: true                   # Queue meta-goals in task system
+    agent_lifecycle: true              # Monitor agent lifecycle events
+    memory_system: true                # Monitor memory health
+    dissonance_tracker: true           # Monitor dissonance levels
+    reflection_orchestrator: true      # Monitor reflection quality
+  
+  # Meta-cognitive analysis parameters
+  analysis:
+    trend_analysis_window: 10          # Number of health checks for trend analysis
+    pattern_detection_threshold: 3     # Minimum occurrences to identify patterns
+    anomaly_clustering_enabled: true   # Group related anomalies
+    goal_effectiveness_tracking: true  # Track meta-goal success rates
+  
+  # Alert and response configuration
+  alerts:
+    critical_health_alert: true        # Alert on critical health issues
+    performance_decline_alert: true    # Alert on sustained performance decline
+    anomaly_spike_alert: true          # Alert on sudden anomaly increases
+    goal_backlog_alert: true           # Alert on excessive goal backlog
+  
+  # Response automation
+  automation:
+    auto_generate_goals: true          # Automatically generate improvement goals
+    auto_schedule_maintenance: true    # Schedule preventive maintenance
+    escalate_critical_issues: true     # Escalate critical issues to high priority
+    adaptive_thresholds: false         # Dynamically adjust thresholds (experimental)
+  
+  # Persistence and logging
+  storage:
+    log_file: "output/meta_self_log.jsonl"     # Main meta-self log file
+    backup_interval_hours: 12                  # Hours between log backups
+    max_log_entries: 10000                     # Maximum log entries before rotation
+    compress_old_logs: true                    # Compress rotated logs
+  
+  # Performance and optimization
+  performance:
+    health_check_timeout: 30           # Seconds timeout for health checks
+    analysis_timeout: 120              # Seconds timeout for deep analysis
+    parallel_component_analysis: true  # Analyze components in parallel
+    cache_health_metrics: true         # Cache recent health metrics
+  
+  # Cognitive self-model parameters
+  self_model:
+    identity_stability_tracking: true  # Track cognitive identity stability
+    capability_assessment: true        # Assess system capabilities
+    limitation_awareness: true         # Monitor system limitations
+    growth_tracking: true              # Track cognitive development
+  
+  # Advanced meta-cognitive features
+  advanced:
+    meta_reflection: true              # Self-reflection on introspection quality
+    recursive_analysis: false          # Recursive self-analysis (experimental)
+    cross_system_correlation: true     # Correlate health across systems
+    predictive_health_modeling: false  # Predict future health issues (experimental)
+
+# === PHASE 28: AUTONOMOUS ACTION PLANNER CONFIGURATION ===
+# High-level planning module for autonomous system evolution and improvement
+autonomous_planner:
+  enabled: true                        # Enable autonomous action planning
+  
+  # Planning cycle timing (no hardcoded values per user preference)
+  planning_interval_hours: 6           # Hours between planning cycles
+  min_plan_score: 0.4                  # Minimum score for plan activation
+  max_active_plans: 3                  # Maximum concurrent active plans
+  lookahead_days: 7                    # Days to project future needs
+  
+  # Plan scoring weights
+  scoring_weights:
+    memory_health: 0.25                # Weight for memory-related plans
+    agent_performance: 0.25            # Weight for agent improvement plans
+    system_stability: 0.20             # Weight for system stability plans
+    goal_achievement: 0.15             # Weight for goal completion plans
+    innovation_potential: 0.15         # Weight for innovation/evolution plans
+  
+  # Future projection parameters
+  projection:
+    memory_growth_threshold: 1.5       # Memory growth ratio to trigger planning
+    drift_prediction_window_hours: 24  # Hours for agent drift prediction
+    confidence_threshold: 0.6          # Minimum confidence for projection-based plans
+    short_term_days: 2                 # Short-term projection timeframe
+    medium_term_days: 7                # Medium-term projection timeframe
+    long_term_days: 30                 # Long-term projection timeframe
+  
+  # Plan execution and management
+  execution:
+    auto_enqueue_goals: true           # Automatically enqueue high-priority goals
+    max_goals_per_cycle: 6             # Maximum goals to enqueue per cycle
+    retry_failed_steps: true           # Retry failed plan steps
+    plan_timeout_days: 7               # Days before plan cancellation
+    rollback_on_failure: true          # Support plan rollback on failure
+  
+  # System integration settings
+  integration:
+    meta_self_agent: true              # Integrate with MetaSelfAgent
+    task_selector: true                # Use TaskSelector for goal queuing
+    memory_system: true                # Monitor memory system state
+    reflection_orchestrator: true      # Integrate with reflection system
+    goal_scorer: true                  # Use goal scoring for prioritization
+  
+  # Plan generation parameters
+  generation:
+    critical_issue_plans: true         # Generate plans for critical issues
+    proactive_maintenance_plans: true  # Generate preventive maintenance plans
+    capability_evolution_plans: true   # Generate capability development plans
+    performance_optimization_plans: true # Generate performance improvement plans
+    innovation_exploration_plans: false # Generate experimental feature plans
+  
+  # Storage and persistence
+  storage:
+    plan_file: "output/action_plan.jsonl"           # Plan storage file
+    log_file: "output/autonomous_planner_log.jsonl" # Planner activity log
+    backup_interval_hours: 24                       # Hours between backups
+    max_stored_plans: 50                            # Maximum plans to store
+    compress_old_plans: true                        # Compress old plan data
+  
+  # Monitoring and analytics
+  monitoring:
+    track_plan_effectiveness: true     # Track plan success rates
+    analyze_projection_accuracy: true  # Analyze projection accuracy
+    goal_completion_tracking: true     # Track generated goal completion
+    system_impact_measurement: true    # Measure planning impact on system health
+  
+  # Safety and constraints
+  safety:
+    require_confirmation_for_critical: false # Require confirmation for critical plans
+    max_resource_allocation: 0.3             # Maximum system resources for planning
+    conflict_detection: true                 # Detect conflicting plans
+    rollback_capability: true                # Maintain rollback capabilities
+
+# === PERSONALITY EVOLUTION CONFIGURATION ===
+# Memory-driven personality shifts for dynamic agent evolution
+personality_evolution:
+  enabled: true                       # Enable personality evolution system
+  
+  # Evolution sensitivity and constraints (no hardcoded values per user preference)
+  sensitivity_threshold: 0.3          # Minimum evolution pressure to trigger changes
+  max_shift_rate: 0.2                 # Maximum trait change per evolution cycle (0-1)
+  mood_decay_rate: 0.1                # Rate at which temporary mood changes decay
+  
+  # Trait value bounds
+  trait_bounds:
+    min: 0.05                         # Minimum trait value (prevents extreme personality loss)
+    max: 0.95                         # Maximum trait value (prevents extreme personality)
+  
+  # Trigger timing configuration
+  weekly_cadence_hours: 168           # Hours between automatic weekly evolution checks (168 = 1 week)
+  major_conflict_threshold: 0.8       # Dissonance pressure level to trigger immediate evolution
+  
+  # Evolution type toggles
+  enable_short_term_evolution: true   # Enable mood and temporary adjustments
+  enable_long_term_evolution: true    # Enable permanent trait changes
+  enable_automatic_triggers: true     # Enable automatic evolution triggers
+  
+  # Analysis parameters
+  memory_analysis:
+    default_lookback_days: 7          # Default days of memory to analyze
+    emotional_drift_threshold: 0.2    # Threshold for detecting emotional language trends
+    theme_analysis_top_n: 5           # Number of top themes to track
+    volatility_detection_window: 7    # Days for volatility trend detection
+  
+  # Trait evolution rules
+  trait_evolution:
+    curiosity:
+      max_increase_per_cycle: 0.15    # Maximum increase per evolution
+      max_decrease_per_cycle: 0.1     # Maximum decrease per evolution
+      triggers: ["memory_trend", "exploration_feedback"]
+    
+    caution:
+      max_increase_per_cycle: 0.2     # Caution can increase faster due to safety
+      max_decrease_per_cycle: 0.1
+      triggers: ["contradiction_stress", "belief_change", "failure_feedback"]
+    
+    empathy:
+      max_increase_per_cycle: 0.15
+      max_decrease_per_cycle: 0.05    # Empathy decreases slowly
+      triggers: ["emotional_drift", "user_sentiment"]
+    
+    assertiveness:
+      max_increase_per_cycle: 0.15
+      max_decrease_per_cycle: 0.15
+      triggers: ["confidence_feedback", "goal_achievement"]
+    
+    optimism:
+      max_increase_per_cycle: 0.2
+      max_decrease_per_cycle: 0.2
+      triggers: ["success_patterns", "failure_patterns", "emotional_drift"]
+    
+    analytical:
+      max_increase_per_cycle: 0.1     # Analytical thinking changes slowly
+      max_decrease_per_cycle: 0.05
+      triggers: ["contradiction_stress", "reasoning_feedback"]
+    
+    creativity:
+      max_increase_per_cycle: 0.15
+      max_decrease_per_cycle: 0.1
+      triggers: ["innovation_success", "routine_patterns"]
+    
+    confidence:
+      max_increase_per_cycle: 0.15
+      max_decrease_per_cycle: 0.2     # Confidence can drop faster than it builds
+      triggers: ["success_patterns", "failure_patterns", "resolution_success"]
+    
+    skepticism:
+      max_increase_per_cycle: 0.25    # Skepticism can increase quickly
+      max_decrease_per_cycle: 0.1     # But decreases slowly
+      triggers: ["contradiction_stress", "belief_conflicts", "verification_failures"]
+    
+    emotional_sensitivity:
+      max_increase_per_cycle: 0.15
+      max_decrease_per_cycle: 0.1
+      triggers: ["emotional_drift", "interpersonal_feedback"]
+  
+  # Trigger condition weights
+  trigger_weights:
+    memory_trend: 0.3               # Weight for memory-based evolution triggers
+    contradiction_stress: 0.4       # Weight for dissonance-based triggers
+    belief_change: 0.3              # Weight for belief volatility triggers
+    user_feedback: 0.5              # Weight for explicit user feedback
+    performance_feedback: 0.35      # Weight for performance-based triggers
+  
+  # Evolution magnitude scaling
+  magnitude_scaling:
+    linear_factor: 1.0              # Base linear scaling
+    exponential_factor: 0.5         # Exponential scaling for extreme pressures
+    dampening_factor: 0.8           # Dampening for consecutive evolutions
+  
+  # Storage and persistence
+  storage:
+    state_file: "output/personality_state.json"           # Current personality vector
+    history_file: "output/personality_evolution.jsonl"    # Evolution trace history
+    backup_interval_hours: 24                             # Hours between state backups
+    max_stored_traces: 100                                 # Maximum evolution traces to keep
+    compress_old_traces: true                              # Compress traces older than 30 days
+  
+  # Safety and rollback
+  safety:
+    max_evolutions_per_day: 5       # Maximum personality evolutions per day
+    require_confirmation_extreme: true  # Require confirmation for large changes
+    extreme_change_threshold: 0.3   # Threshold for "extreme" single trait change
+    rollback_capability: true       # Maintain ability to rollback changes
+    preserve_core_identity: true    # Prevent changes that alter fundamental identity
+  
+  # Integration with other systems
+  integration:
+    meta_self_agent: true           # Integrate with MetaSelfAgent reflection cycles
+    personality_engine: true        # Update ExpressivePersonalityEngine configuration
+    response_generation: true       # Influence response tone and style
+    memory_system: true             # Access memory for trend analysis
+    dissonance_tracker: true        # Monitor contradiction stress levels
+    self_model: true                # Respect SelfModel identity constraints
+  
+  # Monitoring and analytics
+  monitoring:
+    track_evolution_effectiveness: true     # Track if evolutions improve system health
+    analyze_trait_correlations: true       # Analyze relationships between traits
+    measure_stability: true                 # Monitor personality stability over time
+    log_decision_reasoning: true            # Log detailed reasoning for evolution decisions
+  
+  # Experimental features (disabled by default)
+  experimental:
+    dynamic_trait_discovery: false         # Discover new traits from behavior patterns
+    cross_session_learning: false          # Learn from other agent instances
+    predictive_evolution: false            # Predict and prepare future personality needs
+
+# === OS INTEGRATION CONFIGURATION ===
+# Phase 30: MeRNSTA OS Integration - Persistent cognitive service
+os_integration:
+  enabled: true                           # Enable OS-level integration features
+  
+  # API Server Configuration
+  api:
+    port: 8181                            # Local API server port
+    host: "127.0.0.1"                     # API server host (localhost only for security)
+    workers: 1                            # Number of API worker processes
+    reload: false                         # Enable auto-reload in development
+    log_level: "info"                     # API server log level
+    
+  # Daemon Runtime Configuration  
+  runtime:
+    mode: "daemon"                        # Options: daemon, interactive, headless, bridge_only
+    auto_start: true                      # Auto-start daemon on system boot
+    restart_on_failure: true             # Auto-restart daemon if it crashes
+    max_restart_attempts: 5              # Maximum restart attempts before giving up
+    
+  # Background Task Intervals (in seconds)
+  intervals:
+    reflection: 21600                     # Reflection every 6 hours (21600 seconds)
+    planning: 1800                        # Planning every 30 minutes (1800 seconds)
+    memory_consolidation: 3600            # Memory consolidation every hour
+    health_check: 300                     # System health check every 5 minutes
+    context_detection: 60                 # Local app context detection every minute
+    
+  # Context Detection
+  context:
+    detect_active_window: true            # Monitor active application window
+    track_shell_history: true             # Monitor shell command history  
+    monitor_file_changes: false           # Monitor file system changes (resource intensive)
+    context_memory_size: 1000             # Maximum context events to remember
+    
+  # Logging Configuration
+  logging:
+    enabled: true                         # Enable OS integration logging
+    log_file: "output/os_bridge.log"      # Log file path
+    max_size_mb: 50                       # Max log file size before rotation
+    backup_count: 5                       # Number of backup log files to keep
+    log_level: "INFO"                     # Log level (DEBUG, INFO, WARNING, ERROR)
+    
+  # Persistence
+  persistence:
+    state_file: "output/os_integration_state.json"  # Runtime state persistence file
+    save_interval: 300                    # Save state every 5 minutes
+    resume_on_restart: true               # Resume previous state on restart
+    
+  # Security
+  security:
+    local_only: true                      # Only accept local connections
+    require_auth: false                   # Require authentication (future feature)
+    max_requests_per_minute: 100          # Rate limiting for API endpoints
+

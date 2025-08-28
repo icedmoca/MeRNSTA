@@ -1,0 +1,189 @@
+# MeRNSTA Sovereign Mode Configuration
+# Phase 35: Lock, Encrypt, Self-Govern
+# All parameters dynamically configurable - no hard-coding
+
+sovereign_mode:
+  # Core sovereign system settings
+  enabled: false  # Enable sovereign mode operations
+  debug_mode: false  # Enable debug logging for sovereign operations
+  
+  # Identity and Authentication
+  identity:
+    keypair_algorithm: "ed25519"  # Options: ed25519, rsa2048, rsa4096
+    keypair_path: "./storage/sovereign"  # Directory for identity files
+    auto_rotate_days: 90  # Auto-rotate identity keypairs every N days
+    backup_count: 5  # Keep N previous keypair backups
+  
+  # Memory Encryption at Rest
+  memory_encryption:
+    enabled: true
+    algorithm: "aes-gcm"  # AES-GCM for authenticated encryption
+    key_size: 256  # Key size in bits
+    nonce_size: 96  # Nonce size in bits (GCM standard)
+    key_derivation: "pbkdf2"  # Key derivation function
+    kdf_iterations: 100000  # PBKDF2 iterations
+    encrypted_databases:
+      - "memory.db"
+      - "enhanced_memory.db"
+      - "plan_memory.db"
+      - "genome_evolution.db"
+      - "world_beliefs.db"
+      - "constraint_violations.db"
+    backup_encryption: true  # Encrypt backups as well
+  
+  # Agent Contract Enforcement (UCAN-style)
+  contracts:
+    enforcement_mode: "strict"  # Options: strict, advisory, off
+    signature_algorithm: "ed25519"  # Contract signature algorithm
+    contract_expiry_hours: 24  # Default contract validity period
+    auto_renewal: true  # Auto-renew contracts before expiry
+    breach_actions:
+      - "log_violation"  # Log contract breaches
+      - "notify_guardian"  # Notify SovereignGuardianAgent
+      - "suspend_agent"  # Suspend breaching agent (strict mode)
+      - "force_recontract"  # Force agent to re-establish contract
+    
+    # Contract capabilities and constraints
+    default_capabilities:
+      - "memory_read"
+      - "memory_write" 
+      - "file_read"
+      - "network_request"
+    
+    restricted_capabilities:
+      - "system_modify"
+      - "crypto_operations"
+      - "identity_access"
+      - "sovereign_control"
+    
+    # Resource limits per contract
+    resource_limits:
+      max_memory_mb: 1024
+      max_cpu_percent: 50
+      max_network_requests_per_hour: 1000
+      max_file_operations_per_hour: 500
+  
+  # Autonomous Self-Update System
+  self_update:
+    enabled: true
+    update_check_interval_hours: 6  # Check for updates every N hours
+    auto_apply_minor: false  # Auto-apply minor version updates
+    auto_apply_patch: true   # Auto-apply patch updates
+    require_signature: true  # Require cryptographic signature for updates
+    trusted_signers:  # Ed25519 public keys of trusted update sources
+      - "core_dev_key_placeholder"  # To be replaced with actual keys
+    
+    # Update source configuration
+    update_sources:
+      primary: "https://api.mernsta.ai/updates"
+      fallback: "https://github.com/mernsta/releases"
+      local_repo: true  # Enable local git-based updates
+    
+    # Update validation
+    validation:
+      hash_algorithm: "sha256"  # Update package hash verification
+      signature_required: true
+      rollback_enabled: true  # Enable automatic rollback on failure
+      max_rollback_versions: 3
+  
+  # Immutable Audit Logging
+  audit_logs:
+    enabled: true
+    log_level: "info"  # Options: debug, info, warn, error
+    output_format: "json"  # Options: json, structured, plain
+    
+    # Storage configuration
+    storage:
+      local_path: "./logs/sovereign_audit"
+      max_size_mb: 1024  # Max size before rotation
+      rotation_count: 10  # Keep N rotated log files
+      compression: true  # Compress rotated logs
+    
+    # IPFS/CID integration
+    immutable_hashing:
+      enabled: true
+      hash_algorithm: "sha256"  # Hash algorithm for content addressing
+      ipfs_integration: false  # Enable IPFS publishing (requires IPFS node)
+      ipfs_api_url: "http://localhost:5001"  # IPFS API endpoint
+      local_cid_storage: true  # Store CIDs locally even without IPFS
+      batch_size: 100  # Batch N log entries before hashing
+    
+    # What to audit
+    audit_events:
+      - "agent_contract_created"
+      - "agent_contract_breached"
+      - "memory_encrypted"
+      - "memory_decrypted"
+      - "identity_generated"
+      - "identity_rotated"
+      - "self_update_attempted"
+      - "self_update_applied"
+      - "sovereign_command_executed"
+      - "guardian_intervention"
+      - "system_state_changed"
+  
+  # Guardian Agent Configuration
+  guardian:
+    enabled: true
+    check_interval_seconds: 30  # Check contracts every N seconds
+    response_timeout_seconds: 5  # Timeout for guardian responses
+    
+    # Guardian capabilities
+    capabilities:
+      - "contract_enforcement"
+      - "breach_detection"
+      - "agent_suspension"
+      - "emergency_shutdown"
+      - "audit_log_protection"
+    
+    # Guardian triggers
+    triggers:
+      memory_access_without_contract: true
+      resource_limit_exceeded: true
+      unauthorized_crypto_operations: true
+      suspicious_pattern_detected: true
+      manual_intervention_requested: true
+    
+    # Guardian actions
+    actions:
+      log_only: false  # Only log violations without enforcement
+      progressive_enforcement: true  # Escalate enforcement actions
+      emergency_mode: false  # Enable emergency lockdown capabilities
+  
+  # OS Integration and Fingerprinting
+  os_integration:
+    fingerprinting:
+      enabled: true
+      include_hardware: true  # Include hardware info in fingerprint
+      include_network: true   # Include network info in fingerprint
+      include_os_version: true
+      include_installed_software: false  # Privacy consideration
+      fingerprint_hash_algorithm: "sha256"
+    
+    # System monitoring
+    system_monitoring:
+      enabled: true
+      monitor_processes: true
+      monitor_network: true
+      monitor_filesystem: true
+      alert_on_changes: true
+    
+    # Security features
+    security:
+      tamper_detection: true  # Detect system tampering
+      integrity_checking: true  # Regular integrity checks
+      secure_boot_verification: false  # Verify secure boot status
+  
+  # Performance and Limits
+  performance:
+    encryption_cache_size: 1000  # Cache encrypted keys/nonces
+    guardian_max_concurrent_checks: 10
+    audit_log_buffer_size: 1000  # Buffer audit entries before write
+    crypto_operation_timeout_seconds: 30
+  
+  # Development and Testing
+  development:
+    mock_crypto_operations: false  # Use mock crypto for testing
+    bypass_contract_enforcement: false  # Bypass contracts for dev
+    expose_debug_endpoints: false  # Expose debug API endpoints
+    verbose_audit_logging: false  # Extra verbose audit logs

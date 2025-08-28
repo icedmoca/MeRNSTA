@@ -1,0 +1,163 @@
+MeRNSTA Repository Architecture Report
+Generated: [auto]
+
+Scope and exclusions
+- Included: First-party source files under agents/, api/, config/, cortex/, scripts/, storage/, system/, tools/, utils/, vector_memory/, web/, tasks/, monitoring/, cli/, tests/, and root-level project files.
+- Excluded as obvious generated/vendor/output artifacts: .git/, mernsta_venv/ or venv/, node_modules/, external/ (vendor projects), output/, logs/, pids/, generated/, test_generated/, cache/coverage artifacts, *.db, *.log, compiled/assets.
+
+Top-level overview
+- Entry points: main.py (unified launcher), web/main.py (web UI), api/system_bridge.py (local OS-integration API), start_enterprise.py (enterprise orchestrator), start_os_mode.sh (OS daemon/runner), install.py (installer).
+- Core cognition/memory: storage/phase2_cognitive_system.py (primary cognitive pipeline), storage/memory_log.py (triplets + embeddings + search), storage/spacy_extractor.py (NLP extraction), storage/db_utils.py (connection pooling), storage/errors.py (error contracts), vector_memory/* (hybrid memory backends), embedder.py (fallback embedder).
+- Agents: agents/* (23+ specialized cognitive agents), agents/registry.py (agent bootstrap/coordination), agents/agent_contract.py (capabilities/contracts).
+- Orchestration: system/unified_runner.py (full AGI mode), system/integration_runner.py (OS integration daemon), monitoring/* (logging + metrics), tasks/task_queue.py (Celery jobs).
+- Presentation/API: web/* (FastAPI web UI, visualizer), api/* (System Bridge API exposing cognition/memory), web/static/visualizer/js/* (front-end modules).
+- Configuration: config.yaml (declarative parameters), config/settings.py (single source of truth), config/environment.py (env/.env via Pydantic), config/reloader.py (hot-reload).
+
+Dependency backbone (high-signal edges)
+- config/settings.py → imported by: most modules (api/system_bridge, web/main, agents/*, storage/*, system/*, utils/ollama_checker, monitoring/*) to read config.yaml. It defines constants, thresholds, routes, ports, and UI flags.
+- storage/phase2_cognitive_system.py → used by api/system_bridge.py, system/unified_runner.py, agents/base.py for cognition, memory and query processing.
+- storage/db_utils.py → used by storage/memory_log.py, monitoring/metrics.py and other storage modules for pooled, WAL-mode SQLite access.
+- storage/memory_log.py → used by api/system_bridge (media endpoints), monitoring/metrics (dashboard metrics), tests, and internal storage engines.
+- vector_memory/hybrid_memory.py (+ adapters) → used by storage/memory systems to route queries to HRRFormer/VecSymR/default embedder and fuse results.
+- agents/registry.py → used by web.routes.agents and api/system_bridge (/agents/respond) to route queries to specialized agents and debate mode.
+- system/unified_runner.py → launches web/main:app and SystemBridge API concurrently, initializes Phase2AutonomousCognitiveSystem and agents/registry, and supervises background services.
+- api/system_bridge.py → exposes cognition endpoints that call Phase2AutonomousCognitiveSystem methods (ask/search/facts/contradictions/goals/reflect/personality) and visualizer adapters.
+- tools/llm_fallback.py → used by agents/base and downstream agents to produce responses when memory/logic are insufficient; internally uses cortex/response_generation.
+- utils/ollama_checker.py → used at boot (main.py) to validate/start Ollama endpoints where configured.
+
+Root files
+- main.py: Unified CLI. Modes: run (unified), web, api, integration, enterprise, interactive. Preflight checks Ollama via utils/ollama_checker, then starts system/unified_runner.MeRNSTAUnifiedRunner or other modes.
+- start_enterprise.py: Starts Redis/Celery, API (uvicorn api.main:app), performs health checks, prints dashboard URLs; uses config.settings.api_port, monitoring.logger.
+- start_os_mode.sh: Shell wrapper to run integration runner, API bridge, shell client, visualizer; handles venv, WSL/macOS/Linux detection.
+- install.py: Installer; installs requirements, spaCy model; imports storage.phase2_cognitive_system to verify; writes QUICK_START.md.
+- Dockerfile: Python slim + spaCy model; copies project; exposes port 8000; default CMD runs api/main.py.
+- docker-compose.yml: app, worker, beat, db, redis, pgvector services; environment values for DATABASE_URL/REDIS_URL/CELERY.
+- README.md, QUICK_START.md, docs/paper.md: Docs; paper.md is the technical whitepaper; updated with architecture appendix.
+- config.yaml, sovereign_config.yaml: Declarative config; picked up by config/settings.py; sovereign mode config for encryption, contracts, self-update.
+- requirements.txt, pyproject.toml, pytest.ini, LICENSE, OLLAMA_SETUP_SUMMARY.md.
+
+Directory: config/
+- settings.py: Loads config.yaml once; exposes many strongly-typed constants; validates required sections; provides get_config()/reload_config(); exports helpers (get_token_budget, get_user_profile_id). Used by nearly every subsystem.
+- environment.py: Pydantic BaseSettings for enterprise/env settings (.env); used by monitoring, tasks, enterprise paths.
+- reloader.py: Watchdog-based hot-reload; notifies subscribers on .env/config.yaml changes.
+
+Directory: api/
+- system_bridge.py: FastAPI app exposing cognition APIs and visualizer bridges. On startup initializes Phase2AutonomousCognitiveSystem; endpoints: /ask, /memory (search/recent/facts/contradictions), /goal, /reflect, /personality, /visualizer/data, /visualizer/events, /health, /agents/respond (compat). Depends on config.settings and storage.phase2_cognitive_system.
+- main.py: Wrapper that constructs SystemBridgeAPI.app for uvicorn compatibility.
+- routes/__init__.py: Namespace.
+- routes/agent.py: Minimal legacy /agents/respond shim for tests; proxies agent response via agents.registry.
+- routes/memory.py: Legacy multimodal endpoints (upload/search) used by tests; uses MemoryLog.
+
+Directory: web/
+- main.py: FastAPI web app for chat UI and visualizer pages; includes web.routes.agents and web.routes.visualizer; reads config.settings for ports/CORS; uses agents.registry for listing agents/status.
+- routes/agents.py: POST /agents/respond (supports debate mode) and status/capabilities endpoints; depends on agents.registry.
+- routes/visualizer.py: HTML pages for dashboard/modules; reads config for modules and proxies to SystemBridge API for data.
+- static/visualizer/js/core.js: Client-side core utilities for graph visualization.
+- static/visualizer/js/modules/contradiction_map.js: Front-end logic for contradiction map.
+
+Directory: system/
+- unified_runner.py: Orchestrator for full AGI mode. Starts web server (web.main:app), API server (SystemBridgeAPI), initializes Phase2AutonomousCognitiveSystem and agents, starts background loops, optional enterprise features (Celery). Handles preflight process cleanup, signal-driven graceful shutdown, health monitor, and status reporting.
+- integration_runner.py: OS-integration daemon (headless/daemon/interactive); schedules reflection/planning/consolidation/health/context detection at configured intervals; persists state to output/os_integration_state.json.
+- self_update_manager.py: Sovereign/self-update logic (hash/signature/rollback); integrates with storage.audit_logger and system.sovereign_crypto.
+- sovereign_integration.py, sovereign_crypto.py: Sovereign mode helpers (identity, crypto primitives).
+- __init__.py: namespace.
+
+Directory: monitoring/
+- logger.py: structlog-based structured logging; audit channels; correlation context manager; exported helper log_* functions; invoked by enterprise scripts and tasks.
+- metrics.py: Prometheus metrics registry; FastAPI router for /dashboard/metrics; exposes histograms/gauges/counters and helpers to update/record metrics; uses storage.memory_log and config.environment.
+
+Directory: tasks/
+- task_queue.py: Celery app + beat schedule; background tasks for auto_reconciliation, memory_compression, memory_health_check, system_cleanup, meta_self health/deep analysis; uses storage.* and monitoring.*.
+- __init__.py: namespace.
+
+Directory: cli/
+- mernsta_shell.py: Interactive shell client to call SystemBridge API (/ask, /status, /memory, /reflect, /goal, agent info) with a rich TUI; also surfaces Sovereign Mode commands.
+- __init__.py: namespace.
+
+Directory: cortex/
+- response_generation.py: Response generation utilities; integrates MemoryLog and REFLECTIVE_PROMPTING; safe_api_call wrappers.
+- engine.py, conversation.py, contradiction.py, ppo_tuner.py, reconciliation.py, entropy.py, memory_ops.py, personality_ops.py, meta_goals.py, cli_utils.py, cli_commands.py: Cognitive helpers for planning/contradiction/PPO tuning/entropy/conversation; imported by tools/agents where needed.
+- __init__.py: namespace.
+
+Directory: storage/
+- phase2_cognitive_system.py: Core autonomous cognitive agent (Phase 2). Orchestrates extraction (spacy/regex), storage, contradiction detection, search, reflection, goal generation, consolidation, drift, predictive causal modeling, multi-modal support; consumed by api/system_bridge and orchestrators/agents.
+- memory_log.py: Triplet storage/query/search; semantic search + embeddings; contradiction tracking; media upload; uses db_utils, errors, formatters, spacy_extractor, embedder, and memory_utils.
+- memory_utils.py: Utilities for normalization, ranking, clustering, summarization, analytics; imports embedder and config.settings; formatters and TripletFact dataclasses.
+- spacy_extractor.py: spaCy-based triplet extractor + similarity checks; DB pool from db_utils; cosine-based scoring.
+- db_utils.py: Thread-safe connection pool (WAL, retries, busy_timeout) and compatibility shims (get_conn/with_retry) with stats and shutdown.
+- errors.py: DatabaseError/ExternalServiceError + safe wrappers for DB/API calls.
+- enhanced_memory_system.py and related enhanced_* modules: Alternate enhanced memory architecture (belief abstractions, reflex compression, memory autocleaner, predictive causal modeling, causal feedback/explain/predict, visualization), interchangeable in tests/advanced modes.
+- memory_search.py, memory_graphs.py, memory_compression.py, memory_consolidator.py, enhanced_semantic_search.py, enhanced_triplet_extractor.py, enhanced_contradiction_resolver.py, enhanced_summarization.py, contradiction_clustering.py, confabulation_filtering.py, ...: Specialized components used by both phase2 and enhanced paths.
+- db.py, db_backend.py, migrations/*.py: DB schema helpers and migrations (dynamic normalization, sentiment, multimodal fields, fixes to memory tables).
+- plan_memory.py, intention_model.py, self_model.py, emotion_model.py, life_narrative.py, drive_system.py, reflex_log.py, token_graph.py, causal_* modules, predictive_chat_preemption.py, dialogue_clarification_agent.py, autonomous_memory_tuning.py, theory_of_mind_layer.py, recursive_self_inspection.py: Subsystems for plans, intentions, self/personality, emotion, narratives, token-level graphs, causal graphs, predictive chat, clarifications, auto-tuning, ToM, self-inspection.
+- audit_logger.py, memory_encryption.py, upgrade_ledger.py, genome_log.py, recursive_execution_log.py, tool_use_log.py: Persistence for audits/encryption/upgrade ledger/genetic evolution/execution/tool usage.
+- sanitize.py, formatters.py, cache.py: helpers.
+- __init__.py: namespace.
+
+Directory: vector_memory/
+- hybrid_memory.py: HybridVectorMemory orchestrates parallel vectorization across backends with weighted result fusion (confidence, recency, semantic overlap, source weighting). Uses embedder as default; adapters for HRRFormer/VecSymR/HLB.
+- hrrformer_adapter.py: Real HRR encoding (circular convolution binding, bundling) 1024D vectors; deterministic word/position vectors.
+- vecsymr_adapter.py: Bridges to R-based VecSymR encoder via Rscript; returns 512D vectors; includes dependency checks.
+- hlb_adapter.py: HLB vectorizer using external HLBTensor (Hadamard-derived linear binding) with PyTorch; 1024D vectors; checks external availability.
+- config.py: load_memory_config() and adapter wiring.
+- memory_source_logger.py: log source attributions for memory vectors.
+- __init__.py: export adapters and HybridVectorMemory.
+
+Directory: agents/
+- base.py: Abstract BaseAgent; lazy-loads llm_fallback/symbolic_engine/memory_system/personality; contract loading; token budget; lifecycle metrics and updates; unified response building.
+- registry.py: AgentRegistry initializes configured agents, debate mode, capability/status APIs; used by web/api.
+- agent_contract.py: AgentContract dataclass; declarative capabilities, alignment scoring, performance tracking; load/save/update; create defaults; score_all_agents_for_task().
+- planner.py, critic.py, debater.py, reflector.py, recursive_planner.py, self_prompter.py, self_healer.py, architect_analyzer.py, code_refactorer.py, upgrade_manager.py, world_modeler.py, constraint_engine.py, evolution_tree.py, self_replicator.py, agent_replicator.py, decision_planner.py, strategy_evaluator.py, task_selector.py, debate_engine.py, reflection_orchestrator.py, fast_reflex_agent.py, mesh_manager.py, meta_self_agent.py, cognitive_arbiter.py, intent_modeler.py, drift_analysis_agent.py, reflex_anticipator.py, repair_simulator.py, memory_consolidator.py, strategy_optimizer.py, daemon_drift_watcher.py, meta_monitor.py, timeline_engine.py, personality_engine.py, self_model.py, command_router.py, file_writer.py, edit_loop.py, execution_monitor.py, planning_integration.py, cognitive_hooks.py, agent_lifecycle.py, specialized_nodes.py, sovereign_guardian_agent.py, mesh_sync_engine.py, mutation_utils.py: Specialized agents/subsystems, each inheriting BaseAgent or providing agent utilities. They collaborate through AgentRegistry; many interact with storage.* subsystems (memory, contradiction, causal, plan) and tools.
+- __init__.py: namespace.
+
+Directory: tools/
+- llm_fallback.py: LLMFallbackAgent (pattern-based gating + conversation context) → calls cortex/response_generation.generate_response; used in BaseAgent and as last-resort conversational agent.
+- symbolic_engine.py: Symbolic reasoning helpers (imported by BaseAgent when needed).
+- memory_report.py: Reporting/inspection tools for memory (summaries, exports).
+
+Directory: utils/
+- ollama_checker.py: Validates/custom-starts Ollama and tokenizer endpoints; used by main.py and QUICK_START flows.
+- prompt_budget.py: Token-budget utilities (truncate_by_tokens); used by agents.base prompt builder.
+- ollama_tokenizer.py: Helpers for tokenizer interactions.
+- __init__.py: namespace.
+
+Directory: monitoring/web integration
+- monitoring/logger.py + monitoring/metrics.py integrate with web/Main to present dashboard metrics at /dashboard/metrics and write structured logs to logs/.
+
+Directory: scripts/
+- cortex.py: CLI utilities around cortex subsystems (CortexEngine/ConversationManager) and DEFAULT_VALUES from config.
+- demo_agent_contracts.py, create_default_contracts.py: Helpers to generate/inspect contracts.
+
+Directory: tests/
+- Extensive functional/unit tests covering startup flows, OS integration, agents, memory backends, multimodal, normalization, dashboard, enterprise, constraints, upgrades, etc. Many tests rely on the legacy api.routes shims and the SystemBridge endpoints.
+
+Fallback and embeddings
+- embedder.py: Deterministic hash-based 384D embedding for offline/dev fallback; used by vector_memory HybridVectorMemory's default backend and memory utils.
+
+High-level data/control flow
+1) Launch
+   - main.py run → system/unified_runner → initialize Phase2AutonomousCognitiveSystem and agents.registry, start web (web.main:app) and API (SystemBridgeAPI) servers, and background tasks.
+2) Ingestion
+   - API /ask or Web UI → Phase2AutonomousCognitiveSystem → storage.spacy_extractor + memory_log → facts/contradictions update.
+3) Retrieval
+   - Query classification → vector_memory.HybridVectorMemory (parallel backends) → storage.memory_log semantic search.
+4) Reasoning
+   - Agents (via agents.registry) respond or debate; LLMFallback used when confidence low; reflection/orchestration/goal generation scheduled by system runners.
+5) Visualization/Monitoring
+   - Visualizer pages (web.routes.visualizer) call SystemBridge visualizer adapters; monitoring.metrics exposes Prometheus; monitoring.logger writes structured JSON logs.
+
+Selected inter-file coupling (non-exhaustive, strongest edges)
+- api/system_bridge.py ↔ storage/phase2_cognitive_system.py, storage/memory_log.py, agents/registry.py
+- web/main.py ↔ agents/registry.py, web/routes/*
+- system/unified_runner.py ↔ web/main.py, api/system_bridge.py, agents/registry.py, storage/phase2_cognitive_system.py
+- storage/memory_log.py ↔ storage/db_utils.py, storage/spacy_extractor.py, storage/errors.py, embedder.py
+- vector_memory/hybrid_memory.py ↔ embedder.py, vector_memory/*_adapter.py
+- monitoring/metrics.py ↔ storage/memory_log.py, config/environment.py
+- tasks/task_queue.py ↔ storage/* engines, monitoring/*
+- agents/base.py ↔ tools/llm_fallback.py, storage/phase2_cognitive_system.py, config/settings.py, agents/agent_contract.py
+
+Notes on configuration and no-hardcoding policy
+- All thresholds, model names, ports, paths, extraction patterns are defined in config.yaml and/or .env (config.environment). Modules read from config.settings consistently.
+
+End of report
+

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeRNSTA Multi-Agent Cognitive System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Minimal header removed for clean UI -->
+        <div style="height: 8px;"></div>
+
+        <!-- Main Chat Interface -->
+        <div class="chat-container" style="grid-template-columns: 1fr;">
+            <!-- Chat Messages Area -->
+            <div class="chat-area">
+                <div class="messages" id="messages">
+                    <div class="message system-message">
+                        <div class="message-content">
+                            <strong>🤖 MeRNSTA System</strong>
+                            <p>Welcome! This is a simple MeRNSTA chat. Type your message below. Toggle 🧠 Thoughts to see how it thinks. Use ⚖️ Debate to hear from all agents.</p>
+                        </div>
+                        <div class="message-time">{{ "Now" }}</div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input-area">
+                    <div class="input-container">
+                        <textarea 
+                            id="message-input" 
+                            placeholder="Type your message here..."
+                            rows="3"></textarea>
+                        <button id="send-button" class="send-button">
+                            Send 🚀
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <button class="quick-btn" data-message="What is 2+2?">📊 Math</button>
+                        <button class="quick-btn" data-message="How are you?">💬 Greeting</button>
+                        <button class="quick-btn" data-message="Plan a vacation">📋 Plan</button>
+                        <label class="quick-btn" style="display:flex;align-items:center;gap:8px;">
+                            <input type="checkbox" id="debate-mode" /> ⚖️ Debate
+                        </label>
+                        <button class="quick-btn" id="toggle-thoughts">🧠 Thoughts</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Agents are thinking...</p>
+        <div id="thinking-list" class="thinking-list"></div>
+    </div>
+
+    <script>
+        window.MERNSTA_AGENT_NAMES = {{ agent_names | tojson | safe if agent_names is defined else '[]' }};
+        window.API_BASE_URL = {{ api_base_url | tojson | safe if api_base_url is defined else '""' }};
+        class MeRNSTAChat {
+            constructor() {
+                this.messageInput = document.getElementById('message-input');
+                this.sendButton = document.getElementById('send-button');
+                this.messagesContainer = document.getElementById('messages');
+                this.debateMode = document.getElementById('debate-mode');
+                this.loading = document.getElementById('loading');
+                this.thinkingList = document.getElementById('thinking-list');
+                this.connectionStatus = document.getElementById('connection-status');
+                this.showThoughts = false;
+                this.availableAgents = Array.isArray(window.MERNSTA_AGENT_NAMES) ? window.MERNSTA_AGENT_NAMES : [];
+                this.initializeEventListeners();
+            }
+
+            initializeEventListeners() {
+                this.sendButton.addEventListener('click', () => this.sendMessage());
+                this.messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                document.querySelectorAll('.quick-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const message = btn.getAttribute('data-message');
+                        if (message) {
+                            this.messageInput.value = message;
+                            this.sendMessage();
+                        }
+                    });
+                });
+                const toggle = document.getElementById('toggle-thoughts');
+                if (toggle) {
+                    toggle.addEventListener('click', () => {
+                        this.showThoughts = !this.showThoughts;
+                        toggle.textContent = this.showThoughts ? '🧠 Thoughts: ON' : '🧠 Thoughts';
+                    });
+                }
+            }
+
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                const isDebateMode = this.debateMode && this.debateMode.checked;
+                const thinkingAgents = isDebateMode ? this.availableAgents : ['planner'];
+                this.addMessage('user', message, 'You');
+                this.messageInput.value = '';
+                this.showLoading(true, thinkingAgents);
+                try {
+                    const response = await fetch('/agents/respond', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message, agent: null, debate: isDebateMode })
+                    });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const data = await response.json();
+                    const agentName = isDebateMode ? 'All Agents' : (data.agent ? `${data.agent.charAt(0).toUpperCase() + data.agent.slice(1)}Agent` : 'MeRNSTA');
+                    this.addMessage('agent', data.response, agentName);
+                    if (this.showThoughts) {
+                        const meta = this.formatThinkingMeta(data);
+                        if (meta) this.addMessage('system', meta, 'System');
+                        const thoughts = await this.fetchAgentThoughts(agentName, isDebateMode);
+                        if (thoughts) this.addMessage('system', thoughts, 'System');
+                    }
+                    this.updateThinkingListFromResults(data);
+                    this.updateConnectionStatus(true);
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.addMessage('error', `Error: ${error.message}`, 'System');
+                    this.updateConnectionStatus(false);
+                } finally {
+                    setTimeout(() => this.showLoading(false), 300);
+                }
+            }
+
+            async fetchAgentThoughts(agent, debateMode) {
+                try {
+                    const base = (typeof window.API_BASE_URL === 'string' && window.API_BASE_URL) ? window.API_BASE_URL : '';
+                    const res = await fetch(`${base}/visualizer/events`);
+                    if (!res.ok) return null;
+                    const data = await res.json();
+                    const events = (data && data.events) ? data.events.slice(0, 5) : [];
+                    if (!events.length) return null;
+                    const bullet = events.map(ev => `- ${ev.type || 'event'} @ ${ev.timestamp || ''}`).join('\n');
+                    return `🧩 Internal reasoning (recent cognitive events):\n${bullet}`;
+                } catch (_) { return null; }
+            }
+
+            formatThinkingMeta(data) {
+                try {
+                    const parts = [];
+                    if (data.agent) parts.push(`Agent used: ${data.agent}`);
+                    if (data.method) parts.push(`Method: ${data.method}`);
+                    if (typeof data.confidence !== 'undefined' && data.confidence !== null) parts.push(`Confidence: ${Number(data.confidence).toFixed(2)}`);
+                    if (Array.isArray(data.debate_results) && data.debate_results.length) {
+                        const names = data.debate_results.map(r => r.agent).join(', ');
+                        parts.push(`Debate agents: ${names}`);
+                    }
+                    return parts.length ? `🧠 Thinking: ${parts.join(' • ')}` : '';
+                } catch (_) { return ''; }
+            }
+
+            updateThinkingListFromResults(data) {
+                try {
+                    let names = [];
+                    if (Array.isArray(data.debate_results) && data.debate_results.length) {
+                        names = data.debate_results.map(r => r.agent);
+                    } else if (data.agent) {
+                        names = [data.agent];
+                    }
+                    if (names.length) this.showLoading(true, names);
+                } catch (_) { /* noop */ }
+            }
+
+            addMessage(type, content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}-message`;
+                const timestamp = new Date().toLocaleTimeString();
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <strong>${this.getAgentIcon(sender)} ${sender}</strong>
+                        <div class="message-text">${this.formatMessage(content)}</div>
+                    </div>
+                    <div class="message-time">${timestamp}</div>
+                `;
+                this.messagesContainer.appendChild(messageDiv);
+                this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+            }
+
+            getAgentIcon(sender) {
+                const icons = { 'You': '👤', 'All Agents': '🤖', 'System': '⚙️' };
+                return icons[sender] || '🤖';
+            }
+
+            formatMessage(content) {
+                return content
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/---/g, '<hr>');
+            }
+
+            showLoading(show, agents = []) {
+                this.loading.style.display = show ? 'block' : 'none';
+                if (this.thinkingList) {
+                    if (show && Array.isArray(agents) && agents.length) {
+                        const pretty = agents.map(a => `${a.charAt(0).toUpperCase() + a.slice(1)}Agent`);
+                        this.thinkingList.innerHTML = pretty.slice(0, 12).map(name => `<span class="chip">${name}</span>`).join('');
+                    } else {
+                        this.thinkingList.innerHTML = '';
+                    }
+                }
+                this.sendButton.disabled = show;
+            }
+
+            updateConnectionStatus(connected) {
+                if (!this.connectionStatus) return;
+                this.connectionStatus.textContent = connected ? '🟢 Connected' : '🔴 Disconnected';
+                this.connectionStatus.className = connected ? 'status-item connected' : 'status-item disconnected';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => new MeRNSTAChat());
+    </script>
+</body>
+</html> 

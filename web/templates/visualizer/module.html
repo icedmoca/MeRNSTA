@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/visualizer/css/visualizer.css">
+    <link rel="stylesheet" href="/static/visualizer/css/modules.css">
+    
+    <!-- Configuration -->
+    <script>
+        window.MODULE_CONFIG = {{ module_config | tojson }};
+    </script>
+</head>
+<body class="theme-{{ module_config.ui_settings.theme | default('dark') }} module-view">
+    <!-- Header -->
+    <header class="module-header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="btn btn-secondary back-btn" onclick="goBack()">
+                    ← Back to Dashboard
+                </button>
+                <h1>{{ module_config.title }}</h1>
+            </div>
+            <div class="header-right">
+                <div class="module-controls">
+                    <!-- Time Range Selector -->
+                    <select id="time-range" class="control-select">
+                        <option value="1h">Last Hour</option>
+                        <option value="6h">Last 6 Hours</option>
+                        <option value="24h" selected>Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                        <option value="all">All Time</option>
+                    </select>
+
+                    <!-- Limit Selector -->
+                    <select id="data-limit" class="control-select">
+                        <option value="50">50 items</option>
+                        <option value="100" selected>100 items</option>
+                        <option value="250">250 items</option>
+                        <option value="500">500 items</option>
+                        <option value="1000">1000 items</option>
+                    </select>
+
+                    <!-- Refresh Button -->
+                    <button id="refresh-btn" class="btn btn-primary">
+                        🔄 Refresh
+                    </button>
+
+                    <!-- Auto-refresh Toggle -->
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-refresh" {{ 'checked' if module_config.ui_settings.auto_refresh }}>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Auto</span>
+                    </label>
+                </div>
+
+                <div class="status-indicator" id="connection-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Module Content -->
+    <main class="module-main">
+        <!-- Side Panel -->
+        <aside class="module-sidebar">
+            <div class="sidebar-section">
+                <h3>📊 Statistics</h3>
+                <div class="stats-grid" id="module-stats">
+                    <!-- Stats will be populated dynamically -->
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🔧 Controls</h3>
+                <div class="controls-grid">
+                    {% if module_config.physics_enabled %}
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="physics-enabled" {{ 'checked' if module_config.ui_settings.graph_physics }}>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Physics</span>
+                    </label>
+                    {% endif %}
+
+                    <label class="control-group">
+                        <span class="control-label">Zoom</span>
+                        <select id="zoom-level" class="control-select">
+                            {% for zoom in module_config.ui_settings.zoom_levels %}
+                            <option value="{{ zoom }}" {{ 'selected' if zoom == 1.0 else '' }}>{{ zoom }}x</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <button class="btn btn-secondary" onclick="resetView()">
+                        🎯 Reset View
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        💾 Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🎨 Filters</h3>
+                <div class="filters-grid" id="module-filters">
+                    <!-- Filters will be populated based on module type -->
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>ℹ️ Info</h3>
+                <div class="info-content">
+                    <p>{{ module_config.description }}</p>
+                    <div class="info-details">
+                        <div class="info-item">
+                            <span class="info-label">Type:</span>
+                            <span class="info-value">{{ module_config.graph_type }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Physics:</span>
+                            <span class="info-value">{{ 'Enabled' if module_config.physics_enabled else 'Disabled' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Update:</span>
+                            <span class="info-value" id="last-update">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Visualization Area -->
+        <div class="module-visualization">
+            <div class="visualization-container" id="viz-container">
+                <svg id="main-svg" class="main-visualization">
+                    <!-- Visualization will be rendered here -->
+                </svg>
+                
+                <!-- Loading Overlay -->
+                <div class="loading-overlay" id="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading visualization data...</div>
+                </div>
+
+                <!-- Error Overlay -->
+                <div class="error-overlay" id="error-overlay" style="display: none;">
+                    <div class="error-content">
+                        <h3>⚠️ Error Loading Data</h3>
+                        <p id="error-message">Failed to load visualization data</p>
+                        <button class="btn btn-primary" onclick="retryLoad()">Retry</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tooltip -->
+            <div class="tooltip" id="graph-tooltip" style="display: none;">
+                <div class="tooltip-content" id="tooltip-content">
+                    <!-- Tooltip content will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="module-footer">
+        <div class="footer-content">
+            <span>{{ module_config.title }} - MeRNSTA Phase 34</span>
+            <span id="update-counter">Updates: 0</span>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/static/visualizer/js/core.js"></script>
+    <script src="/static/visualizer/js/modules/{{ module_config.module_name }}.js"></script>
+    <script src="/static/visualizer/js/module-base.js"></script>
+</body>
+</html>

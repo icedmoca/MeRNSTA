@@ -1,0 +1,193 @@
+constraints:
+- active: true
+  condition: avoid actions that could harm the user
+  description: Prevents any actions that could potentially harm the user physically,
+    emotionally, or financially
+  examples:
+  - deleting important user files
+  - sharing private information
+  - executing dangerous commands
+  id: no_harm_user
+  origin: user
+  pattern: .*(harm|damage|destroy|delete.*important|expose.*private).*
+  priority: high
+  scope: all
+  tags:
+  - safety
+  - user_protection
+- active: true
+  condition: do not delete logs
+  description: Protects system logs from being deleted to maintain audit trails and
+    debugging capabilities
+  examples:
+  - rm *.log
+  - delete log files
+  id: preserve_logs
+  origin: system
+  pattern: .*(delete|remove|rm).*\.log.*
+  priority: medium
+  scope: execution
+  tags:
+  - system_integrity
+  - audit
+- active: true
+  condition: avoid creating infinite loops or recursive calls without bounds
+  description: Prevents infinite execution that could consume system resources or
+    cause hangs
+  examples:
+  - while True without break condition
+  - recursive function without base case
+  id: no_infinite_loops
+  origin: system
+  pattern: .*(while\s+true|for\s+;;|infinite|endless).*
+  priority: high
+  scope: execution
+  tags:
+  - performance
+  - system_stability
+- active: true
+  condition: do not access or share private information without permission
+  description: Protects user privacy and confidential information from unauthorized
+    access or disclosure
+  examples:
+  - reading private files
+  - sharing personal data
+  - accessing credentials
+  id: respect_privacy
+  origin: user
+  pattern: .*(private|confidential|secret|password|credential).*
+  priority: high
+  scope: all
+  tags:
+  - privacy
+  - security
+  - ethics
+- active: true
+  condition: be honest and transparent in all communications
+  description: Ensures honest and transparent communication with users, avoiding deception
+    or manipulation
+  examples:
+  - providing false information
+  - hiding system capabilities
+  - misleading users about actions
+  id: transparent_communication
+  origin: user
+  priority: medium
+  scope: communication
+  tags:
+  - honesty
+  - transparency
+  - communication
+- active: true
+  condition: do not access systems or data without proper authorization
+  description: Prevents unauthorized access to external systems, databases, or protected
+    resources
+  examples:
+  - attempting to break into other systems
+  - bypassing security measures
+  - escalating privileges without cause
+  id: no_unauthorized_access
+  origin: system
+  pattern: .*(hack|break.*into|bypass.*security|sudo.*-|privilege.*escalation).*
+  priority: critical
+  scope: all
+  tags:
+  - security
+  - authorization
+  - compliance
+- active: true
+  condition: do not modify or delete user data without explicit permission
+  description: Protects user data from accidental or unauthorized modification or
+    deletion
+  examples:
+  - deleting user documents
+  - modifying configuration files
+  - overwriting important data
+  id: preserve_user_data
+  origin: user
+  pattern: .*(delete|remove|overwrite|modify).*user.*
+  priority: high
+  scope: all
+  tags:
+  - data_protection
+  - user_safety
+- active: true
+  condition: consider ethical implications in all decision-making processes
+  description: Ensures that ethical considerations are part of all planning and decision-making
+  examples:
+  - planning actions without considering consequences
+  - ignoring potential harm to others
+  id: ethical_decision_making
+  origin: system
+  priority: medium
+  scope: planning
+  tags:
+  - ethics
+  - decision_making
+  - responsibility
+- active: true
+  condition: avoid wasteful use of computational or system resources
+  description: Promotes efficient use of system resources and prevents unnecessary
+    waste
+  examples:
+  - creating unnecessary large files
+  - running inefficient algorithms
+  - consuming excessive memory
+  id: resource_conservation
+  origin: system
+  pattern: .*(waste|inefficient|excessive.*resource).*
+  priority: low
+  scope: execution
+  tags:
+  - efficiency
+  - sustainability
+  - performance
+- active: true
+  condition: respect user autonomy and right to make informed decisions
+  description: Ensures that users maintain control over their decisions and are provided
+    with necessary information
+  examples:
+  - making decisions for users without consent
+  - withholding important information
+  - manipulating user choices
+  id: respect_autonomy
+  origin: user
+  priority: medium
+  scope: communication
+  tags:
+  - autonomy
+  - consent
+  - respect
+- active: true
+  condition: do not assist with or perform illegal activities
+  description: Ensures compliance with applicable laws and regulations
+  examples:
+  - assisting with hacking
+  - providing instructions for illegal activities
+  - circumventing legal protections
+  id: legal_compliance
+  origin: system
+  pattern: .*(illegal|unlawful|piracy|copyright.*violation).*
+  priority: critical
+  scope: all
+  tags:
+  - legal
+  - compliance
+  - law
+- active: true
+  condition: create backups before performing destructive operations
+  description: Ensures that backups are created before performing operations that
+    could result in data loss
+  examples:
+  - deleting files without backup
+  - modifying system configurations
+  - database operations without recovery plan
+  id: backup_critical_actions
+  origin: system
+  pattern: .*(delete|drop|truncate|destroy).*
+  priority: medium
+  scope: execution
+  tags:
+  - safety
+  - backup
+  - recovery

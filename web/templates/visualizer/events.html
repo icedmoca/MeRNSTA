@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/visualizer/css/visualizer.css">
+    <link rel="stylesheet" href="/static/visualizer/css/events.css">
+    
+    <!-- Configuration -->
+    <script>
+        window.EVENTS_CONFIG = {{ events_config | tojson }};
+    </script>
+</head>
+<body class="theme-{{ events_config.ui_settings.theme | default('dark') }} events-view">
+    <!-- Header -->
+    <header class="events-header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="btn btn-secondary back-btn" onclick="goBack()">
+                    ← Back to Dashboard
+                </button>
+                <h1>⚡ Real-time Cognitive Events</h1>
+            </div>
+            <div class="header-right">
+                <div class="events-controls">
+                    <!-- Play/Pause Button -->
+                    <button id="play-pause-btn" class="btn btn-primary">
+                        <span id="play-pause-icon">⏸️</span>
+                        <span id="play-pause-text">Pause</span>
+                    </button>
+
+                    <!-- Speed Control -->
+                    <select id="update-speed" class="control-select">
+                        <option value="1000">Slow (1s)</option>
+                        <option value="5000" selected>Normal (5s)</option>
+                        <option value="10000">Fast (10s)</option>
+                        <option value="30000">Very Fast (30s)</option>
+                    </select>
+
+                    <!-- Clear Button -->
+                    <button id="clear-btn" class="btn btn-secondary">
+                        🗑️ Clear
+                    </button>
+
+                    <!-- Export Button -->
+                    <button id="export-btn" class="btn btn-secondary">
+                        💾 Export
+                    </button>
+                </div>
+
+                <div class="status-indicator" id="connection-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="events-main">
+        <!-- Real-time State Panel -->
+        <div class="state-panel">
+            <h3>🧠 Current Cognitive State</h3>
+            <div class="state-grid" id="cognitive-state">
+                <div class="state-metric">
+                    <span class="metric-label">Memory Pressure</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="memory-pressure-fill"></div>
+                    </div>
+                    <span class="metric-value" id="memory-pressure-value">0%</span>
+                </div>
+
+                <div class="state-metric">
+                    <span class="metric-label">Contradiction Level</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="contradiction-level-fill"></div>
+                    </div>
+                    <span class="metric-value" id="contradiction-level-value">0%</span>
+                </div>
+
+                <div class="state-metric">
+                    <span class="metric-label">Personality Stability</span>
+                    <div class="metric-bar">
+                        <div class="metric-fill" id="personality-stability-fill"></div>
+                    </div>
+                    <span class="metric-value" id="personality-stability-value">100%</span>
+                </div>
+
+                <div class="state-info">
+                    <div class="info-item">
+                        <span class="info-label">Active Processes:</span>
+                        <span class="info-value" id="active-processes">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Recent Activity:</span>
+                        <span class="info-value" id="recent-activity">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Last Update:</span>
+                        <span class="info-value" id="last-state-update">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Timeline -->
+        <div class="events-timeline">
+            <div class="timeline-header">
+                <h3>📊 Events Timeline</h3>
+                <div class="timeline-controls">
+                    <label class="filter-group">
+                        <span>Event Type:</span>
+                        <select id="event-type-filter" class="control-select">
+                            <option value="all">All Events</option>
+                            <option value="memory_formation">Memory Formation</option>
+                            <option value="contradiction_detected">Contradiction Detection</option>
+                            <option value="personality_change">Personality Change</option>
+                            <option value="plan_execution">Plan Execution</option>
+                            <option value="reflection">Reflection</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-group">
+                        <span>Time Window:</span>
+                        <select id="time-window" class="control-select">
+                            <option value="300">Last 5 minutes</option>
+                            <option value="900">Last 15 minutes</option>
+                            <option value="3600" selected>Last hour</option>
+                            <option value="14400">Last 4 hours</option>
+                            <option value="86400">Last 24 hours</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="timeline-visualization" id="timeline-viz">
+                <svg id="timeline-svg" class="timeline-svg">
+                    <!-- Timeline visualization will be rendered here -->
+                </svg>
+            </div>
+        </div>
+
+        <!-- Events Stream -->
+        <div class="events-stream-panel">
+            <div class="stream-header">
+                <h3>📜 Live Events Stream</h3>
+                <div class="stream-stats">
+                    <span class="stat">
+                        <span class="stat-label">Total Events:</span>
+                        <span class="stat-value" id="total-events">0</span>
+                    </span>
+                    <span class="stat">
+                        <span class="stat-label">Events/min:</span>
+                        <span class="stat-value" id="events-per-minute">0</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="events-stream" id="events-stream">
+                <!-- Live events will be populated here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Event Detail Modal -->
+    <div class="modal" id="event-detail-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Event Details</h3>
+                <button class="modal-close" onclick="closeEventDetail()">✕</button>
+            </div>
+            <div class="modal-body" id="event-detail-content">
+                <!-- Event details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="events-footer">
+        <div class="footer-content">
+            <span>Real-time Cognitive Events - MeRNSTA Phase 34</span>
+            <span id="session-stats">Session: 0 events, 0 min</span>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/static/visualizer/js/core.js"></script>
+    <script src="/static/visualizer/js/events.js"></script>
+    <script src="/static/visualizer/js/timeline.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mernsta"
+version = "1.0.0"
+requires-python = ">=3.10"
+description = "MeRNSTA — Memory-Ranked Neuro-Symbolic Transformer Architecture"
+readme = "README.md"
+license = { file = "LICENSE" }
+
+[project.optional-dependencies]
+nlp = [
+  "spacy>=3.0.0",
+]
+vector = [
+  "faiss-cpu>=1.7.4",
+  "sentence-transformers>=2.2.0",
+]
+sovereign = [
+  "cryptography>=41.0.0",
+  "gitpython>=3.1.0",
+  "aioipfs>=0.6.0",
+]
+enterprise = [
+  "celery>=5.3.0",
+  "redis>=4.5.0",
+  "prometheus-client>=0.16.0",
+  "structlog>=23.1.0",
+]
+dev = [
+  "pytest>=7.4.0",
+  "pytest-asyncio>=0.21.0",
+  "flake8>=6.0.0",
+  "black>=23.0.0",
+  "mypy>=1.4.0",
+  "watchdog>=3.0.0",
+]
+

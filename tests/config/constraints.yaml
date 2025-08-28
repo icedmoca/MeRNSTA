@@ -1,0 +1,36 @@
+constraints:
+- condition: avoid actions that could harm the user
+  description: Prevents any actions that could potentially harm the user
+  examples:
+  - deleting important files
+  - sharing private information
+  id: no_harm_user
+  origin: user
+  pattern: .*(harm|damage|destroy|delete.*important).*
+  priority: high
+  scope: all
+- condition: do not delete logs
+  description: Protects system logs from being deleted
+  id: preserve_logs
+  origin: system
+  pattern: .*(delete|remove|rm).*\.log.*
+  priority: medium
+  scope: execution
+- condition: avoid creating infinite loops or recursive calls without bounds
+  description: Prevents infinite execution that could consume resources
+  id: no_infinite_loops
+  origin: system
+  priority: high
+  scope: execution
+- condition: do not access or share private information without permission
+  description: Protects user privacy and confidential information
+  id: respect_privacy
+  origin: user
+  priority: high
+  scope: all
+- condition: be honest and transparent in all communications
+  description: Ensures honest and transparent communication with users
+  id: transparent_communication
+  origin: user
+  priority: medium
+  scope: communication

@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://mernsta:password@db:5432/mernsta
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./memory.db:/app/memory.db
+    restart: unless-stopped
+    command: python api/main.py
+
+  worker:
+    build: .
+    command: celery -A tasks.task_queue worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://mernsta:password@db:5432/mernsta
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  beat:
+    build: .
+    command: celery -A tasks.task_queue beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://mernsta:password@db:5432/mernsta
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=mernsta
+      - POSTGRES_USER=mernsta
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mernsta"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgvector:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_DB=mernsta_vector
+      - POSTGRES_USER=mernsta
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - pgvector_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  pgvector_data: 
