@@ -1,6 +1,6 @@
 # MeRNSTA — Memory‑Ranked Neuro‑Symbolic Transformer Architecture
 
-**World's First Fully Autonomous Cognitive AGI System**  
+*This repo is versions behind*
 *Version 1.0.0 · Production-Ready · Self-Adaptive · Enterprise-Grade*
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/icedmoca/mernsta/actions)
@@ -11,7 +11,7 @@
 
 ---
 
-## 🚀 **Quick Start (Unified Full AGI Mode)**
+##  **Quick Start (Unified Full AGI Mode)**
 
 ### Install
 ```bash
